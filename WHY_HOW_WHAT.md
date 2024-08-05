@@ -18,6 +18,9 @@ Technical administration with admin priviledges
 
 #### Accounting
 
+- Generate balance overview (list sorted by name/balance)
+- List users with negative balance larger than X
+
 #### User management
 
 - Adding new user
@@ -51,3 +54,4 @@ Technical administration with admin priviledges
 - Automatic estimation of coffee consumption development
 - Announcement of personal and total number of coffees per day ("It's your 3rd coffee today and the 56th in total")
 - Random joke for every booked coffee
+- 
