@@ -2,19 +2,10 @@
 
 ## Use cases
 
-### Roles
-
-#### Coffee consumer
-
-Our tired standard users
-
+### Standard user/consumer activities
 - Book a coffee
 - Check account balance
-- Book buying a pack of coffee/balance account
-
-#### Admin
-
-Technical administration with admin priviledges
+- Check statistics (aka "What is my performance level?" or "Am I consuming too much coffee?")
 
 #### Accounting
 
@@ -54,4 +45,21 @@ Technical administration with admin priviledges
 - Automatic estimation of coffee consumption development
 - Announcement of personal and total number of coffees per day ("It's your 3rd coffee today and the 56th in total")
 - Random joke for every booked coffee
-- 
+- Random coffee facts
+
+### Roles
+
+#### Coffee consumer
+
+Our tired standard users
+
+- Identified purely by RFID ID of ZF ID
+- Book a coffee
+- Check account balance
+- Book buying a pack of coffee/balance account
+
+#### Admin
+
+Technical administration with admin priviledges
+
+- Identified by username/pw combo in admin interface or SSH access to machine (Raspi, etc.)
