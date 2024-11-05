@@ -3,6 +3,7 @@
 ## Use cases
 
 ### Standard user/consumer activities
+
 - Book a coffee
 - Check account balance
 - Check statistics (aka "What is my performance level?" or "Am I consuming too much coffee?")
@@ -56,10 +57,19 @@ Our tired standard users
 - Identified purely by RFID ID of ZF ID
 - Book a coffee
 - Check account balance
+Optionally(?):
 - Book buying a pack of coffee/balance account
+
+#### Accountant
+
+- Accounting
+- Account & price management
+- User management
 
 #### Admin
 
 Technical administration with admin priviledges
 
 - Identified by username/pw combo in admin interface or SSH access to machine (Raspi, etc.)
+- Access to all functions
+- 
