@@ -54,7 +54,7 @@
 
 Our tired standard users
 
-- Identified purely by RFID ID of ZF ID
+- Identified purely by RFID UID of personal badge
 - Book a coffee
 - Check account balance
 Optionally(?):

@@ -6,7 +6,9 @@
 ## Screen/Display?
 
 --> 7" IPS - Touchdisplay
+
 --> Mini-OLED
+
 --> Seven-Segment-Display (for the extra old school vibe)
 
 ## LEDs
@@ -16,6 +18,7 @@
 ## Audio
 
 --> Piezo Buzzer
+
 --> Mini Speaker with DAC/Mini-Amp
 
 ## Connectivity
