@@ -1,0 +1,1 @@
+0 2 * * * /usr/bin/python3 /home/pi/kaffeekasse_v1/scripts/daily_backup.py

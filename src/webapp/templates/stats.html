@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Statistik der letzten 7 Tage</h2>
+<p>Gesamtanzahl Kaffees: {{ total_coffee }}</p>
+<table>
+    <tr>
+        <th>Datum</th>
+        <th>Anzahl Kaffees</th>
+    </tr>
+    {% for day, count in daily_counts.items() %}
+    <tr>
+        <td>{{ day }}</td>
+        <td>{{ count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

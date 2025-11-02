@@ -48,6 +48,11 @@
 - Random joke for every booked coffee
 - Random coffee facts
 
+#### Link with coffee machine
+
+- Detect if coffee was brewed, but nothing was booked in a certain time window
+- Compare number of brewed coffees with number of booked coffees
+
 ### Roles
 
 #### Coffee consumer

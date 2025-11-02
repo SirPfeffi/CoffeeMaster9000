@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>{{ user.name }} (ID: {{ user.id }})</h2>
+<p>Guthaben: {{ "%.2f"|format(user.balance) }} €</p>
+
+<h3>Einzahlen</h3>
+<form method="post">
+    <input type="text" name="amount" placeholder="Betrag in €">
+    <button type="submit">Einzahlen</button>
+</form>
+
+<h3>Letzte Buchungen</h3>
+<table>
+    <tr>
+        <th>Datum/Zeit</th>
+        <th>Beschreibung</th>
+        <th>Betrag (€)</th>
+    </tr>
+    {% for t in transactions %}
+    <tr>
+        <td>{{ t.timestamp.strftime("%d.%m.%Y %H:%M") }}</td>
+        <td>{{ t.description }}</td>
+        <td>{{ "%.2f"|format(t.amount) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

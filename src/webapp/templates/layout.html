@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Kaffeekasse Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Kaffeekasse Admin</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Startseite</a> |
+            <a href="{{ url_for('users') }}">Benutzer</a> |
+            <a href="{{ url_for('stats') }}">Statistik</a> |
+            <a href="{{ url_for('backup') }}">Backup</a>
+        </nav>
+        <hr>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
