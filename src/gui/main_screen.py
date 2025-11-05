@@ -1,5 +1,6 @@
+# src/gui/main_screen.py
 from kivy.uix.screenmanager import Screen
-from kivy.properties import StringProperty, NumericProperty, BooleanProperty
+from kivy.properties import StringProperty, BooleanProperty
 from kivy.clock import Clock
 from core.account_manager import AccountManager
 from core.rfid_manager import RFIDManager
@@ -8,10 +9,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class MainScreen(Screen):
+    # Kivy-Event hier per Klassen-API definieren
+    __events__ = ('on_admin_activate',)
+
     current_user_name = StringProperty("Bitte Karte scannen")
     current_user_balance = StringProperty("")
     feedback = StringProperty("")
-    feedback_color = StringProperty("white")
+    feedback_color = StringProperty("")  # '#a6e6a6' oder '#f7a6a6'
     is_admin_mode = BooleanProperty(False)
 
     def __init__(self, **kwargs):
@@ -19,78 +23,82 @@ class MainScreen(Screen):
         self.am = AccountManager()
         self.rfid = RFIDManager()
         self.rfid.set_callback(self.on_rfid)
-        # schedule periodic check only if hardware present
+        # nur alle 0.5s auf Karten prüfen (RFIDManager kann intern None haben)
         Clock.schedule_interval(lambda dt: self.rfid.check_for_card(), 0.5)
         self._auto_return_ev = None
+        self._last_user = None  # Peewee User-Objekt oder None
 
     def on_rfid(self, uid: str):
+        """Callback vom RFID-Manager, uid als String."""
         logger.info("RFID erkannt: %s", uid)
         user = self.am.get_user_by_uid(uid)
         if not user:
             self.show_feedback(f"Unbekannte Karte: {uid}", error=True)
             return
-        # check admin
+
+        # Admin prüfen (User-Modell muss is_admin BooleanField haben)
         if getattr(user, "is_admin", False):
             self.is_admin_mode = True
-            self.show_feedback("Admin-Modus aktiviert", timeout=5, success=True)
-            # inform other parts via event
-            self.dispatch("on_admin_activate", user)
+            self._last_user = user
+            self.show_feedback("Admin-Modus aktiviert", success=True, timeout=5)
+            # Event für andere Komponenten dispatchen
+            self.dispatch('on_admin_activate', user)
             return
-        # normal user
+
+        # Normaler Benutzer: laden und anzeigen
         self.load_user(user)
 
     def load_user(self, user):
+        """Zeigt Benutzerinformationen an und speichert aktuellen Benutzer."""
+        self._last_user = user
         self.current_user_name = user.name
         self.current_user_balance = f"{user.balance:.2f} €"
         self.show_feedback(f"Willkommen, {user.name}", success=True)
 
     def book_coffee(self):
-        # attempts to book coffee for current user
-        # find user by name (safer to store current user id in real impl)
-        users = self.am.db.execute_sql("SELECT id FROM user WHERE name = ?", (self.current_user_name,))
-        # simple approach: fetch user object by name
-        user = self.am.get_user_by_uid(self._last_uid) if hasattr(self, '_last_uid') else None
-        if not user:
-            # try to get by name
-            user = self.am.get_user_by_uid(self.ids.get('uid_input').text) if 'uid_input' in self.ids else None
+        """Bucht einen Kaffee für den aktuell geladenen Benutzer."""
+        user = self._last_user
         if not user:
             self.show_feedback("Kein Benutzer geladen", error=True)
             return
         try:
             self.am.book_coffee(user)
-            user = self.am.get_user_by_uid(user.rfid_uid)  # refresh
+            # balance aktualisieren
+            user = self.am.get_user_by_uid(user.rfid_uid)
+            self._last_user = user
             self.current_user_balance = f"{user.balance:.2f} €"
             self.show_feedback("Kaffee gebucht", success=True)
-            # auto return to default after 5s
             self.schedule_return(5)
         except Exception as e:
-            logger.exception("Fehler beim Buchen")
+            logger.exception("Fehler beim Buchen: %s", e)
             self.show_feedback(str(e), error=True)
 
     def deposit(self, amount_str):
-        user = self.am.get_user_by_uid(self._last_uid) if hasattr(self, '_last_uid') else None
+        """Zahlt Betrag für aktuell geladenen Benutzer ein."""
+        user = self._last_user
         if not user:
             self.show_feedback("Kein Benutzer geladen", error=True)
             return
         try:
             self.am.deposit(user, amount_str)
             user = self.am.get_user_by_uid(user.rfid_uid)
+            self._last_user = user
             self.current_user_balance = f"{user.balance:.2f} €"
             self.show_feedback("Einzahlung erfolgreich", success=True)
             self.schedule_return(5)
         except Exception as e:
-            logger.exception("Fehler bei Einzahlung")
+            logger.exception("Fehler bei Einzahlung: %s", e)
             self.show_feedback(str(e), error=True)
 
     def show_feedback(self, message, success=False, error=False, timeout=3):
+        """Setzt die Feedback-Meldung und Farbe; optional timeout für Reset."""
         self.feedback = message
         if success:
             self.feedback_color = "#a6e6a6"  # light green
         elif error:
             self.feedback_color = "#f7a6a6"  # light red
         else:
-            self.feedback_color = "white"
-        # TODO: play sound if desired
+            self.feedback_color = ""
         if timeout and timeout > 0:
             self.schedule_return(timeout)
 
@@ -100,15 +108,16 @@ class MainScreen(Screen):
         self._auto_return_ev = Clock.schedule_once(lambda dt: self.reset_screen(), seconds)
 
     def reset_screen(self):
+        """Setzt Anzeige zurück auf Default (kein geladener Benutzer)."""
         self.current_user_name = "Bitte Karte scannen"
         self.current_user_balance = ""
         self.feedback = ""
-        self.feedback_color = "white"
+        self.feedback_color = ""
         self.is_admin_mode = False
+        self._last_user = None
 
-    # Kivy event for admin activation
+    # Event-Handler (Stub) — andere Widgets/Controller können sich daran binden
     def on_admin_activate(self, user):
+        # default: nichts tun; andere Komponenten können binden
+        logger.info("Admin aktiviert: %s", getattr(user, "name", "unknown"))
         pass
-
-# register custom event
-MainScreen.register_event_type('on_admin_activate')
