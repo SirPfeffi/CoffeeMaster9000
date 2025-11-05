@@ -1,29 +1,15 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from db.models import Base, User
+# src/core/database.py
+from peewee import SqliteDatabase
+import os
 
-DB_PATH = "data/kaffeekasse.db"
+# SQLite-Datei im Projektverzeichnis
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "coffee.db")
 
-def init_db():
-    """Initialisiert die SQLite-Datenbank und erstellt ggf. Tabellen."""
-    import os
-    os.makedirs("data", exist_ok=True)
-    engine = create_engine(f"sqlite:///{DB_PATH}")
-    Base.metadata.create_all(engine)
-    return engine
+# Peewee-DB-Objekt
+db = SqliteDatabase(DB_PATH)
 
-def get_session():
-    """Erstellt eine neue DB-Session."""
-    engine = create_engine(f"sqlite:///{DB_PATH}")
-    Session = sessionmaker(bind=engine)
-    return Session()
 
-# Initial-Admin anlegen, falls DB leer ist
-def create_default_admin():
-    session = get_session()
-    if not session.query(User).first():
-        admin = User(name="Admin", rfid_uid="00000000", balance=0.0, is_admin=True)
-        session.add(admin)
-        session.commit()
-        print("[DB] Standard-Admin angelegt (UID=00000000)")
-    session.close()
+def initialize_database(models):
+    """Erstellt Tabellen, falls sie noch nicht existieren."""
+    with db:
+        db.create_tables(models, safe=True)

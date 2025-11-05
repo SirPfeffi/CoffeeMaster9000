@@ -1,0 +1,9 @@
+<AdminScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            text: root.stats_text
+        Button:
+            text: "Zurück"
+            size_hint_y: 0.15
+            on_press: app.root.get_screen('main').reset_screen()

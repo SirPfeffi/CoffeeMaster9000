@@ -1,31 +1,29 @@
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.scrollview import ScrollView
+from db.models import User, Transaction
+from peewee import fn
+from datetime import timedelta, datetime
 
 class StatsPopup(Popup):
-    def __init__(self, account_manager, days=7, **kwargs):
+    def __init__(self, days=7, **kwargs):
         super().__init__(**kwargs)
-        self.title = f"Kaffeestatistik ({days} Tage)"
-        self.size_hint = (0.9, 0.7)
-        self.auto_dismiss = True
+        self.title = "Statistiken"
+        self.size_hint = (0.9, 0.8)
+        layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        total_users = User.select().count()
+        total_transactions = Transaction.select().count()
+        total_balance = User.select(fn.SUM(User.balance_cents)).scalar() or 0
+        from kivy.uix.label import Label
+        layout.add_widget(Label(text=f"Benutzer: {total_users}"))
+        layout.add_widget(Label(text=f"Transaktionen: {total_transactions}"))
+        layout.add_widget(Label(text=f"Gesamtguthaben: {total_balance/100:.2f} €"))
 
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        today = datetime.now().date()
+        for i in range(days):
+            day = today - timedelta(days=i)
+            count = Transaction.select().where((Transaction.description=="Kaffee") & (Transaction.timestamp.date()==day)).count()
+            layout.add_widget(Label(text=f"{day.strftime('%d.%m.%Y')}: {count}"))
 
-        total = account_manager.get_total_coffee()
-        layout.add_widget(Label(text=f"Gesamtanzahl gebuchter Kaffees: {total}", font_size=20))
-
-        daily_counts = account_manager.get_daily_coffee_counts(days=days)
-
-        scroll = ScrollView()
-        grid = GridLayout(cols=1, size_hint_y=None, spacing=5)
-        grid.bind(minimum_height=grid.setter('height'))
-
-        for day, count in daily_counts.items():
-            grid.add_widget(Label(text=f"{day}: {count} Kaffees", size_hint_y=None, height=30))
-
-        scroll.add_widget(grid)
-        layout.add_widget(scroll)
-
+        from kivy.uix.button import Button
+        layout.add_widget(Button(text="Schließen", size_hint_y=None, height=40, on_press=lambda *_: self.dismiss()))
         self.add_widget(layout)
