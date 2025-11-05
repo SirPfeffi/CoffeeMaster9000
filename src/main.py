@@ -13,7 +13,7 @@ Window.size = (800, 480)
 class KaffeeKasseApp(App):
     def build(self):
         Builder.load_file("gui/mainscreen.kv")
-        self.account_manager = AccountManager(db_path="db/kaffeekasse.db")
+        self.account_manager = AccountManager()
         self.main_screen = MainScreen()
         self.rfid_manager = RFIDManager(spi_bus=0, spi_device=0)
         self.rfid_manager.set_callback(self.on_rfid_scan)
