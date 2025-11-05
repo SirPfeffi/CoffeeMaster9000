@@ -1,65 +1,54 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+from core.account_manager import AccountManager
+from db.models import init_db, User
+from decimal import Decimal, InvalidOperation
 import os
-import datetime
-from flask import Flask, render_template, redirect, url_for, request, flash
-from models import User, Transaction, db  # dein bestehendes Peewee-Modell
-from account_manager import AccountManager  # deine bestehende Logik
-
-
-# Pfad zur SQLite-Datenbank
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "kaffeekasse.db")
-
-# Verbindung herstellen
-db.init(DB_PATH)
-account_manager = AccountManager()  # nutzt automatisch dasselbe DB-Objekt
 
 app = Flask(__name__)
-app.secret_key = "dein_geheimes_schluesselwort"  # für Flash-Messages
+app.secret_key = os.environ.get("KAFFEEKASSE_SECRET", "UNSAFE_DEFAULT_KEY")
 
-account_manager = AccountManager()
+init_db()
+am = AccountManager()
 
-# Startseite
+def parse_amount_to_cents(value: str) -> int:
+    try:
+        d = Decimal(value.replace(",", ".")).quantize(Decimal("0.01"))
+        return int(d * 100)
+    except InvalidOperation:
+        raise ValueError("Ungültiger Betrag")
+
 @app.route("/")
 def index():
-    total_coffee = account_manager.get_total_coffee()
-    return render_template("index.html", total_coffee=total_coffee)
+    users = User.select().order_by(User.name)
+    return render_template("index.html", users=users)
 
-# Benutzerliste
-@app.route("/users")
-def users():
-    all_users = User.select()
-    return render_template("users.html", users=all_users)
-
-# Benutzer-Details + Guthaben bearbeiten
-@app.route("/user/<int:user_id>", methods=["GET", "POST"])
-def user_detail(user_id):
-    user = User.get_by_id(user_id)
-    if request.method == "POST":
-        try:
-            amount = float(request.form["amount"])
-            account_manager.deposit(user, amount)
-            flash(f"{amount:.2f} € eingezahlt für {user.name}", "success")
-            return redirect(url_for("user_detail", user_id=user.id))
-        except ValueError:
-            flash("Ungültiger Betrag!", "danger")
-    transactions = Transaction.select().where(Transaction.user == user).order_by(Transaction.timestamp.desc()).limit(10)
-    return render_template("user_detail.html", user=user, transactions=transactions)
-
-# Statistikseite
-@app.route("/stats")
-def stats():
-    daily_counts = account_manager.get_daily_coffee_counts(days=7)
-    total_coffee = account_manager.get_total_coffee()
-    return render_template("stats.html", daily_counts=daily_counts, total_coffee=total_coffee)
-
-# Backup starten
-@app.route("/backup")
-def backup():
+@app.route("/deposit", methods=["POST"])
+def deposit():
+    uid = request.form.get("rfid_uid")
+    amount = request.form.get("amount")
+    user = am.get_user_by_uid(uid)
+    if not user:
+        flash("Unbekannter Benutzer.", "danger")
+        return redirect(url_for("index"))
     try:
-        account_manager.perform_backup()
-        flash("Backup erfolgreich erstellt!", "success")
-    except Exception as e:
-        flash(f"Backup fehlgeschlagen: {e}", "danger")
+        am.deposit(user, amount)
+        flash(f"Einzahlung von {amount} € erfolgreich!", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+    return redirect(url_for("index"))
+
+@app.route("/coffee/<uid>")
+def book_coffee(uid):
+    user = am.get_user_by_uid(uid)
+    if not user:
+        flash("Benutzer nicht gefunden.", "danger")
+        return redirect(url_for("index"))
+    try:
+        am.book_coffee(user)
+        flash(f"Kaffee gebucht für {user.name}.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
