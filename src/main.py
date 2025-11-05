@@ -15,7 +15,7 @@ class KaffeeKasseApp(App):
         Builder.load_file("gui/mainscreen.kv")
         self.account_manager = AccountManager()
         self.main_screen = MainScreen()
-        self.rfid_manager = RFIDManager(spi_bus=0, spi_device=0)
+        self.rfid_manager = RFIDManager()
         self.rfid_manager.set_callback(self.on_rfid_scan)
         Clock.schedule_interval(lambda dt: self.rfid_manager.check_for_card(), 0.5)
         return self.main_screen
