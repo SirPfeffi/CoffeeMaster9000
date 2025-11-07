@@ -1,82 +1,89 @@
+#:kivy 2.2.0
 
-#:import dp kivy.metrics.dp
+<ZFStyles@BoxLayout>:
+    zf_primary: 0.0, 0.34, 0.72, 1        # ZF-Blau (#0057B7)
+    zf_bg: 0.898, 0.91, 0.941, 1          # Hellgrau (#E5E9F0)
+    zf_text: 0.118, 0.118, 0.118, 1       # Textfarbe (#1E1E1E)
+    zf_success: 0.102, 0.737, 0.612, 1    # Grünlich (#1ABC9C)
+    zf_error: 0.839, 0.153, 0.157, 1      # Rot (#D62828)
+
 <MainScreen>:
+    name: "main"
     canvas.before:
         Color:
-            rgba: 0.96,0.96,0.97,1
+            rgba: self.zf_bg
         Rectangle:
             pos: self.pos
             size: self.size
+
     BoxLayout:
-        orientation: 'vertical'
-        padding: dp(18)
-        spacing: dp(12)
+        orientation: "vertical"
+
+        # Header mit ZF-Logo
         BoxLayout:
             size_hint_y: None
-            height: dp(80)
-            Label:
-                text: "CoffeeMaster9000"
-                font_size: '28sp'
-                bold: True
-                color: 0.12,0.12,0.12,1
-        BoxLayout:
-            size_hint_y: None
-            height: dp(120)
-            spacing: dp(12)
+            height: dp(72)
+            padding: dp(8)
+            spacing: dp(8)
             canvas.before:
                 Color:
-                    rgba: 1,1,1,1
-                RoundedRectangle:
+                    rgba: self.zf_primary
+                Rectangle:
                     pos: self.pos
                     size: self.size
-                    radius: [12,]
-            BoxLayout:
-                orientation: 'vertical'
-                padding: dp(12)
-                Label:
-                    id: user_label
-                    text: root.current_user_name
-                    font_size: '22sp'
-                    color: 0.1,0.1,0.1,1
-                Label:
-                    id: balance_label
-                    text: root.current_user_balance
-                    font_size: '20sp'
-                    color: 0.2,0.6,0.2,1
+
+            Image:
+                source: "assets/zf_logo.png"
+                size_hint: None, None
+                size: dp(56), dp(56)
+                allow_stretch: True
+
+            Label:
+                text: "CoffeeMaster9000"
+                color: 1, 1, 1, 1
+                font_size: "22sp"
+                bold: True
+                halign: "left"
+                valign: "middle"
+
+        # Hauptinhalt
         BoxLayout:
-            size_hint_y: None
-            height: dp(80)
-            spacing: dp(12)
-            Button:
-                text: "Kaffee buchen"
-                on_press: root.book_coffee()
-                background_normal: ''
-                background_color: 0.09,0.59,0.53,1
-                color: 1,1,1,1
-            Button:
-                text: "Einzahlen 1.00 €"
-                on_press: root.deposit('1.00')
-                background_normal: ''
-                background_color: 0.2,0.6,0.86,1
-                color: 1,1,1,1
-        BoxLayout:
-            size_hint_y: None
-            height: dp(50)
+            orientation: "vertical"
+            padding: dp(40)
+            spacing: dp(20)
+
+            Label:
+                text: "Bitte UID eingeben oder Karte scannen:"
+                color: root.zf_text
+                font_size: "18sp"
+                halign: "center"
+
             TextInput:
                 id: uid_input
-                hint_text: "UID (Simulation)"
+                hint_text: "Beispiel: 04A1B2C3D4"
+                on_text_validate: root.process_uid(uid_input.text)
                 multiline: False
-                on_text_validate: root.load_user(root.ids.uid_input.text)
-        BoxLayout:
-            size_hint_y: None
-            height: dp(50)
+                font_size: "20sp"
+                size_hint_y: None
+                height: dp(60)
+                background_color: 1, 1, 1, 1
+                foreground_color: root.zf_text
+                cursor_color: root.zf_primary
+                padding: [dp(10), dp(10)]
+                on_focus: if self.focus and self.text == self.hint_text: self.text = ""
+
+            Button:
+                text: "Bestätigen"
+                size_hint_y: None
+                height: dp(50)
+                background_color: root.zf_primary
+                color: 1, 1, 1, 1
+                on_release: root.process_uid(uid_input.text)
+
             Label:
-                id: feedback
-                text: root.feedback
-                size_hint_x: 1
-                canvas.before:
-                    Color:
-                        rgba: (0.65,0.95,0.65,1) if root.feedback_color == '#a6e6a6' else ((0.97,0.65,0.65,1) if root.feedback_color == '#f7a6a6' else (1,1,1,0))
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
+                id: info_label
+                text: ""
+                color: root.zf_text
+                font_size: "16sp"
+                halign: "center"
+                valign: "middle"

@@ -1,9 +1,75 @@
+#:kivy 2.2.0
+
 <AdminScreen>:
+    name: "admin"
+    canvas.before:
+        Color:
+            rgba: 0.898, 0.91, 0.941, 1  # Hellgrau
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
     BoxLayout:
         orientation: "vertical"
-        Label:
-            text: root.stats_text
-        Button:
-            text: "Zurück"
-            size_hint_y: 0.15
-            on_press: app.root.get_screen('main').reset_screen()
+
+        # Header mit Logo + Admin-Hinweis
+        BoxLayout:
+            size_hint_y: None
+            height: dp(72)
+            padding: dp(8)
+            spacing: dp(8)
+            canvas.before:
+                Color:
+                    rgba: 0.0, 0.34, 0.72, 1  # ZF-Blau
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Image:
+                source: "assets/zf_logo.png"
+                size_hint: None, None
+                size: dp(56), dp(56)
+                allow_stretch: True
+
+            Label:
+                text: "Admin-Modus"
+                color: 1, 1, 1, 1
+                font_size: "22sp"
+                bold: True
+                halign: "left"
+                valign: "middle"
+
+        # Hauptinhalt
+        BoxLayout:
+            orientation: "vertical"
+            padding: dp(30)
+            spacing: dp(20)
+
+            Label:
+                text: "Verwaltung & Systemsteuerung"
+                color: 0.118, 0.118, 0.118, 1
+                font_size: "20sp"
+
+            Button:
+                text: "Benutzerübersicht"
+                size_hint_y: None
+                height: dp(50)
+                background_color: 0.0, 0.34, 0.72, 1
+                color: 1, 1, 1, 1
+                on_release: root.show_users()
+
+            Button:
+                text: "Transaktionen anzeigen"
+                size_hint_y: None
+                height: dp(50)
+                background_color: 0.0, 0.34, 0.72, 1
+                color: 1, 1, 1, 1
+                on_release: root.show_transactions()
+
+            Button:
+                text: "Abmelden"
+                size_hint_y: None
+                height: dp(50)
+                background_color: 0.839, 0.153, 0.157, 1  # Rot
+                color: 1, 1, 1, 1
+                on_release: app.return_to_main()
