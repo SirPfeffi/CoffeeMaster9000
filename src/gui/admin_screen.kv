@@ -1,8 +1,17 @@
 #:kivy 2.2.0
 #:import dp kivy.metrics.dp
 
+# Lokales ZF Theme (identisch mit mainscreen.kv)
+<ZFTheme@BoxLayout>:
+    zf_primary: [0.0, 0.34, 0.72, 1]      # ZF Blau
+    zf_bg: [0.90, 0.91, 0.94, 1]          # Hellgrau
+    zf_text: [0.12, 0.12, 0.12, 1]        # Dunkelgrau
+    zf_success: [0.10, 0.73, 0.61, 1]     # Grünlich
+    zf_error: [0.83, 0.15, 0.16, 1]       # Rot
+
 <AdminScreen@ZFTheme>:
-    name: "admin"
+    name: "admin_screen"
+
     canvas.before:
         Color:
             rgba: self.zf_bg
@@ -12,68 +21,82 @@
 
     BoxLayout:
         orientation: "vertical"
+        spacing: dp(20)
+        padding: dp(40)
 
-        # Header
+        # Kopfzeile mit ZF Logo
         BoxLayout:
+            orientation: "horizontal"
             size_hint_y: None
-            height: dp(72)
-            padding: dp(8)
-            spacing: dp(8)
-            canvas.before:
-                Color:
-                    rgba: self.zf_primary
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            height: dp(100)
+            spacing: dp(20)
 
             Image:
                 source: "assets/zf_logo.png"
-                size_hint: None, None
-                size: dp(56), dp(56)
+                size_hint_x: None
+                width: dp(150)
                 allow_stretch: True
                 keep_ratio: True
 
             Label:
-                text: "Admin-Modus"
-                color: 1, 1, 1, 1
-                font_size: "22sp"
+                text: "Administratorbereich"
+                font_size: "26sp"
                 bold: True
-                halign: "left"
+                color: root.zf_text
                 valign: "middle"
+                halign: "left"
 
-        BoxLayout:
-            orientation: "vertical"
-            padding: dp(30)
-            spacing: dp(20)
-
-            Label:
-                text: "Verwaltung & Systemsteuerung"
-                color: self.zf_text
-                font_size: "20sp"
+        # Admin-Aktionen
+        GridLayout:
+            cols: 2
+            spacing: dp(15)
+            size_hint_y: None
+            height: self.minimum_height
 
             Button:
-                text: "Benutzerübersicht"
-                size_hint_y: None
-                height: dp(50)
-                background_normal: ''
-                background_color: self.zf_primary
-                color: 1, 1, 1, 1
-                on_release: root.show_users()
+                text: "Benutzer hinzufügen"
+                background_color: root.zf_primary
+                color: [1, 1, 1, 1]
+                on_release: app.add_user_dialog()
 
             Button:
-                text: "Transaktionen anzeigen"
-                size_hint_y: None
-                height: dp(50)
-                background_normal: ''
-                background_color: self.zf_primary
-                color: 1, 1, 1, 1
-                on_release: root.show_transactions()
+                text: "Benutzer entfernen"
+                background_color: root.zf_error
+                color: [1, 1, 1, 1]
+                on_release: app.remove_user_dialog()
+
+            Button:
+                text: "Saldo anpassen"
+                background_color: root.zf_primary
+                color: [1, 1, 1, 1]
+                on_release: app.adjust_balance_dialog()
+
+            Button:
+                text: "Transaktionen ansehen"
+                background_color: root.zf_primary
+                color: [1, 1, 1, 1]
+                on_release: app.show_transactions()
+
+            Button:
+                text: "Systemeinstellungen"
+                background_color: root.zf_primary
+                color: [1, 1, 1, 1]
+                on_release: app.show_settings_dialog()
 
             Button:
                 text: "Abmelden"
-                size_hint_y: None
-                height: dp(50)
-                background_normal: ''
-                background_color: self.zf_error
-                color: 1, 1, 1, 1
-                on_release: app.return_to_main()
+                background_color: root.zf_error
+                color: [1, 1, 1, 1]
+                on_release: app.logout_admin()
+
+        # Statusbereich
+        Label:
+            id: admin_status_label
+            text: ""
+            color: root.zf_text
+            font_size: "16sp"
+            halign: "center"
+            valign: "middle"
+
+        Widget:
+            size_hint_y: 0.3
