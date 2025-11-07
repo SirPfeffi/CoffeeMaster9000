@@ -7,6 +7,8 @@ from gui.main_screen import MainScreen
 from core.rfid_manager import RFIDManager
 from core.account_manager import AccountManager
 
+
+Builder.load_file("src/gui/theme.kv")
 kivy.require("2.3.0")
 Window.size = (800, 480)
 

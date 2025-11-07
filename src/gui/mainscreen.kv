@@ -1,13 +1,7 @@
 #:kivy 2.2.0
+#:import dp kivy.metrics.dp
 
-<ZFStyles@BoxLayout>:
-    zf_primary: 0.0, 0.34, 0.72, 1        # ZF-Blau (#0057B7)
-    zf_bg: 0.898, 0.91, 0.941, 1          # Hellgrau (#E5E9F0)
-    zf_text: 0.118, 0.118, 0.118, 1       # Textfarbe (#1E1E1E)
-    zf_success: 0.102, 0.737, 0.612, 1    # Grünlich (#1ABC9C)
-    zf_error: 0.839, 0.153, 0.157, 1      # Rot (#D62828)
-
-<MainScreen>:
+<MainScreen@ZFTheme>:
     name: "main"
     canvas.before:
         Color:
@@ -19,7 +13,7 @@
     BoxLayout:
         orientation: "vertical"
 
-        # Header mit ZF-Logo
+        # Header mit Logo
         BoxLayout:
             size_hint_y: None
             height: dp(72)
@@ -37,6 +31,7 @@
                 size_hint: None, None
                 size: dp(56), dp(56)
                 allow_stretch: True
+                keep_ratio: True
 
             Label:
                 text: "CoffeeMaster9000"
@@ -46,7 +41,7 @@
                 halign: "left"
                 valign: "middle"
 
-        # Hauptinhalt
+        # Inhalt
         BoxLayout:
             orientation: "vertical"
             padding: dp(40)
@@ -54,36 +49,38 @@
 
             Label:
                 text: "Bitte UID eingeben oder Karte scannen:"
-                color: root.zf_text
+                color: self.zf_text
                 font_size: "18sp"
                 halign: "center"
 
             TextInput:
                 id: uid_input
                 hint_text: "Beispiel: 04A1B2C3D4"
-                on_text_validate: root.process_uid(uid_input.text)
                 multiline: False
                 font_size: "20sp"
                 size_hint_y: None
                 height: dp(60)
                 background_color: 1, 1, 1, 1
-                foreground_color: root.zf_text
-                cursor_color: root.zf_primary
+                foreground_color: self.zf_text
+                cursor_color: self.zf_primary
                 padding: [dp(10), dp(10)]
-                on_focus: if self.focus and self.text == self.hint_text: self.text = ""
+                on_focus:
+                    if self.focus and self.text == self.hint_text: self.text = ""
+                    if not self.focus and self.text == "": self.text = self.hint_text
 
             Button:
                 text: "Bestätigen"
                 size_hint_y: None
                 height: dp(50)
-                background_color: root.zf_primary
+                background_normal: ''
+                background_color: self.zf_primary
                 color: 1, 1, 1, 1
-                on_release: root.process_uid(uid_input.text)
+                on_release: root.on_rfid(uid_input.text)
 
             Label:
                 id: info_label
                 text: ""
-                color: root.zf_text
+                color: self.zf_text
                 font_size: "16sp"
                 halign: "center"
                 valign: "middle"

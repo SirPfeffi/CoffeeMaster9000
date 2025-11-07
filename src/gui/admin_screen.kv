@@ -1,10 +1,11 @@
 #:kivy 2.2.0
+#:import dp kivy.metrics.dp
 
-<AdminScreen>:
+<AdminScreen@ZFTheme>:
     name: "admin"
     canvas.before:
         Color:
-            rgba: 0.898, 0.91, 0.941, 1  # Hellgrau
+            rgba: self.zf_bg
         Rectangle:
             pos: self.pos
             size: self.size
@@ -12,7 +13,7 @@
     BoxLayout:
         orientation: "vertical"
 
-        # Header mit Logo + Admin-Hinweis
+        # Header
         BoxLayout:
             size_hint_y: None
             height: dp(72)
@@ -20,7 +21,7 @@
             spacing: dp(8)
             canvas.before:
                 Color:
-                    rgba: 0.0, 0.34, 0.72, 1  # ZF-Blau
+                    rgba: self.zf_primary
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -30,6 +31,7 @@
                 size_hint: None, None
                 size: dp(56), dp(56)
                 allow_stretch: True
+                keep_ratio: True
 
             Label:
                 text: "Admin-Modus"
@@ -39,7 +41,6 @@
                 halign: "left"
                 valign: "middle"
 
-        # Hauptinhalt
         BoxLayout:
             orientation: "vertical"
             padding: dp(30)
@@ -47,14 +48,15 @@
 
             Label:
                 text: "Verwaltung & Systemsteuerung"
-                color: 0.118, 0.118, 0.118, 1
+                color: self.zf_text
                 font_size: "20sp"
 
             Button:
                 text: "Benutzerübersicht"
                 size_hint_y: None
                 height: dp(50)
-                background_color: 0.0, 0.34, 0.72, 1
+                background_normal: ''
+                background_color: self.zf_primary
                 color: 1, 1, 1, 1
                 on_release: root.show_users()
 
@@ -62,7 +64,8 @@
                 text: "Transaktionen anzeigen"
                 size_hint_y: None
                 height: dp(50)
-                background_color: 0.0, 0.34, 0.72, 1
+                background_normal: ''
+                background_color: self.zf_primary
                 color: 1, 1, 1, 1
                 on_release: root.show_transactions()
 
@@ -70,6 +73,7 @@
                 text: "Abmelden"
                 size_hint_y: None
                 height: dp(50)
-                background_color: 0.839, 0.153, 0.157, 1  # Rot
+                background_normal: ''
+                background_color: self.zf_error
                 color: 1, 1, 1, 1
                 on_release: app.return_to_main()
