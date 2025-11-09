@@ -17,22 +17,26 @@ from core.account_manager import AccountManager
 kivy.require("2.3.0")
 Window.size = (800, 480)
 
-# KV-Dateien laden
-Builder.load_file("src/gui/theme.kv")
-Builder.load_file("src/gui/mainscreen.kv")
-Builder.load_file("src/gui/adminscreen.kv")
-
-
 class RootManager(ScreenManager):
     theme = ObjectProperty(None)
 
 
 class CoffeeMasterApp(App):
     def build(self):
+
+        # KV-Dateien laden
+        Builder.load_file("src/gui/theme.kv")
+        Builder.load_file("src/gui/mainscreen.kv")
+        Builder.load_file("src/gui/adminscreen.kv")
+
         root = RootManager(transition=FadeTransition())
 
         # Theme-Instanz erstellen
-        root.theme = Factory.ThemeWidget()
+        try:
+            root.theme = Factory.ThemeWidget()
+        except Exception:
+            # Fallback: Theme per dict/list direkt setzen oder erstellen
+            root.theme = Factory.ThemeWidget()  # lässt Fehler anzeigen, falls nicht definiert
 
         # Screens hinzufügen
         self.mainscreen = MainScreen(name="mainscreen")
