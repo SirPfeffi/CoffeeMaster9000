@@ -15,9 +15,6 @@ from core.account_manager import AccountManager
 kivy.require("2.3.0")
 Window.size = (800, 480)
 
-class RootManager(ScreenManager):
-    theme = ObjectProperty(None)
-
 class CoffeeMasterApp(App):
     def build(self):
 
