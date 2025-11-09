@@ -1,0 +1,15 @@
+#:kivy 2.2.0
+
+ScreenManager:
+    id: screenmanager
+
+    # globales Theme-Widget
+    ThemeWidget:
+        id: theme
+        opacity: 0  # unsichtbar, speichert Farben global
+
+    MainScreen:
+        name: "mainscreen"
+
+    AdminScreen:
+        name: "adminscreen"
