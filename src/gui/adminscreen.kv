@@ -1,12 +1,9 @@
-#:kivy 2.2.0
-#:import dp kivy.metrics.dp
-
-<AdminScreen@ZFTheme>:
+<AdminScreen>:
     name: "adminscreen"
 
     canvas.before:
         Color:
-            rgba: self.zf_bg
+            rgba: root.manager.theme.background
         Rectangle:
             pos: self.pos
             size: self.size
@@ -16,78 +13,42 @@
         spacing: dp(20)
         padding: dp(40)
 
-        # Kopfbereich mit Logo und Titel
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint_y: None
-            height: dp(100)
-            spacing: dp(20)
+        Label:
+            text: "Adminbereich – CoffeeMaster 9000"
+            color: root.manager.theme.text
+            font_size: "24sp"
+            bold: True
 
-            Image:
-                source: "assets/zf_logo.png"
-                size_hint: (None, None)
-                size: dp(120), dp(80)
-                allow_stretch: True
-                keep_ratio: True
-
-            Label:
-                text: "Adminbereich – CoffeeMaster 9000"
-                color: root.zf_text
-                font_size: "24sp"
-                bold: True
-                halign: "left"
-                valign: "middle"
-                text_size: self.size
-
-        # Adminfunktionen
         GridLayout:
             cols: 2
-            spacing: dp(15)
+            spacing: dp(10)
             size_hint_y: None
             height: self.minimum_height
-            row_default_height: dp(60)
 
             Button:
                 text: "Benutzerverwaltung"
-                background_color: root.zf_primary
+                background_color: root.manager.theme.primary
                 color: [1, 1, 1, 1]
-                on_release: app.open_user_management()
 
             Button:
                 text: "Kassensaldo anzeigen"
-                background_color: root.zf_primary
+                background_color: root.manager.theme.primary
                 color: [1, 1, 1, 1]
-                on_release: app.show_balance()
 
             Button:
                 text: "Einzahlung buchen"
-                background_color: root.zf_success
+                background_color: root.manager.theme.success
                 color: [1, 1, 1, 1]
-                on_release: app.add_credit()
 
             Button:
                 text: "Fehlbuchung stornieren"
-                background_color: root.zf_error
+                background_color: root.manager.theme.error
                 color: [1, 1, 1, 1]
-                on_release: app.cancel_transaction()
 
-        Widget:
-            size_hint_y: 0.2
-
-        # Statusbereich
-        Label:
-            id: admin_status_label
-            text: ""
-            color: root.zf_text
-            font_size: "16sp"
-            halign: "center"
-            valign: "middle"
-
-        # Logout-Button
         Button:
             text: "Zurück zum Hauptbildschirm"
+            background_color: root.manager.theme.primary
+            color: [1, 1, 1, 1]
             size_hint_y: None
             height: dp(50)
-            background_color: root.zf_primary
-            color: [1, 1, 1, 1]
             on_release: app.switch_to_main()

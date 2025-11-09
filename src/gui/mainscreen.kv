@@ -1,12 +1,9 @@
-#:kivy 2.2.0
-#:import dp kivy.metrics.dp
-
-<MainScreen@ZFTheme>:
-    name: "main_screen"
+<MainScreen>:
+    name: "mainscreen"
 
     canvas.before:
         Color:
-            rgba: app.root.ids.theme.background
+            rgba: root.manager.theme.background
         Rectangle:
             pos: self.pos
             size: self.size
@@ -16,20 +13,11 @@
         spacing: dp(20)
         padding: dp(40)
 
-        # ZF Logo
-        Image:
-            source: "assets/zf_logo.png"
-            size_hint_y: None
-            height: dp(100)
-            allow_stretch: True
-            keep_ratio: True
-
         Label:
             text: "Willkommen beim CoffeeMaster 9000"
+            color: root.manager.theme.text
             font_size: "24sp"
-            color: root.zf_text
             bold: True
-            halign: "center"
 
         TextInput:
             id: uid_input
@@ -38,34 +26,22 @@
             size_hint_y: None
             height: dp(48)
             background_color: [1, 1, 1, 1]
-            foreground_color: root.zf_text
+            foreground_color: root.manager.theme.text
             on_focus:
                 if self.focus: self.text = "" if self.text == self.hint_text else self.text
 
-        BoxLayout:
+        Button:
+            text: "Login"
+            background_color: root.manager.theme.primary
+            color: [1, 1, 1, 1]
             size_hint_y: None
-            height: dp(60)
-            spacing: dp(15)
+            height: dp(50)
+            on_release: app.on_rfid_scan(uid_input.text)
 
-            Button:
-                text: "Login"
-                background_color: root.zf_primary
-                color: [1, 1, 1, 1]
-                on_release: app.login_with_uid(uid_input.text)
-
-            Button:
-                text: "Abbrechen"
-                background_color: root.zf_error
-                color: [1, 1, 1, 1]
-                on_release: uid_input.text = uid_input.hint_text
-
-        Label:
-            id: status_label
-            text: ""
-            color: root.zf_text
-            font_size: "16sp"
-            halign: "center"
-            valign: "middle"
-
-        Widget:
-            size_hint_y: 0.3
+        Button:
+            text: "Adminmodus (Test)"
+            background_color: root.manager.theme.success
+            color: [1, 1, 1, 1]
+            size_hint_y: None
+            height: dp(50)
+            on_release: app.root.current = "adminscreen"
