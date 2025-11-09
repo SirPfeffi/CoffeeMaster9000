@@ -29,14 +29,15 @@ class CoffeeMasterApp(App):
         Builder.load_file("src/gui/adminscreen.kv")
         
         root = Builder.load_file("src/gui/main.kv")
-
-
         
         screen_manager = root.ids.screenmanager
 
-        # Screens hinzufügen
-        self.mainscreen = screen_manager.get_screen("mainscreen")
-        self.adminscreen = screen_manager.get_screen("adminscreen")
+        self.mainscreen = MainScreen(name="mainscreen")    # <-- MANUELLE ERSTELLUNG
+        self.adminscreen = AdminScreen(name="adminscreen")  # <-- MANUELLE ERSTELLUNG
+
+        screen_manager.add_widget(self.mainscreen)       # <-- HINZUFÜGEN
+        screen_manager.add_widget(self.adminscreen)      # <-- HINZUFÜGEN
+
         screen_manager.current = "mainscreen"
 
         #root.theme = root.ids.theme
