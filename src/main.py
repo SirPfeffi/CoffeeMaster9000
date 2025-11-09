@@ -25,10 +25,12 @@ class CoffeeMasterApp(App):
 
         # KV-Dateien laden
         Builder.load_file("src/gui/theme.kv")
+        
+        root = Builder.load_file("src/gui/main.kv")
+
         Builder.load_file("src/gui/mainscreen.kv")
         Builder.load_file("src/gui/adminscreen.kv")
         
-        root = Builder.load_file("src/gui/main.kv")
         screen_manager = root.ids.screenmanager
 
         # Screens hinzufügen
