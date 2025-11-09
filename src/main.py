@@ -29,12 +29,13 @@ class CoffeeMasterApp(App):
         Builder.load_file("src/gui/mainscreen.kv")
         Builder.load_file("src/gui/adminscreen.kv")
         
-        root = RootManager(transition=FadeTransition())
         root = Builder.load_file("src/gui/main.kv")       
 
         # Screens hinzufügen
         self.mainscreen = root.get_screen("mainscreen")
         self.adminscreen = root.get_screen("adminscreen")
+
+        root.theme = root.ids.theme
 
         # Manager für Logik
         self.account_manager = AccountManager()
