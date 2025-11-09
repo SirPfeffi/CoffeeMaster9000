@@ -3,9 +3,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, FadeTransition
-from kivy.properties import ObjectProperty
-from kivy.factory import Factory
+from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 
 # Eigene Module
 from gui.mainscreen import MainScreen
@@ -24,22 +22,22 @@ class CoffeeMasterApp(App):
     def build(self):
 
         # KV-Dateien laden
-        Builder.load_file("src/gui/theme.kv")
+        #Builder.load_file("src/gui/theme.kv")
         
         root = Builder.load_file("src/gui/main.kv")
 
-        Builder.load_file("src/gui/mainscreen.kv")
-        Builder.load_file("src/gui/adminscreen.kv")
+        #Builder.load_file("src/gui/mainscreen.kv")
+        #Builder.load_file("src/gui/adminscreen.kv")
             
-        screen_manager = root.ids.screenmanager
+        #screen_manager = root.ids.screenmanager
 
-        self.mainscreen = MainScreen(name="mainscreen")    # <-- MANUELLE ERSTELLUNG
-        self.adminscreen = AdminScreen(name="adminscreen")  # <-- MANUELLE ERSTELLUNG
+        #self.mainscreen = MainScreen(name="mainscreen")    # <-- MANUELLE ERSTELLUNG
+        #self.adminscreen = AdminScreen(name="adminscreen")  # <-- MANUELLE ERSTELLUNG
 
-        screen_manager.add_widget(self.mainscreen)       # <-- HINZUFÜGEN
-        screen_manager.add_widget(self.adminscreen)      # <-- HINZUFÜGEN
+        #screen_manager.add_widget(self.mainscreen)       # <-- HINZUFÜGEN
+        #screen_manager.add_widget(self.adminscreen)      # <-- HINZUFÜGEN
 
-        screen_manager.current = "mainscreen"
+        #screen_manager.current = "mainscreen"
 
         #root.theme = root.ids.theme
 

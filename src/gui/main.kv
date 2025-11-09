@@ -1,11 +1,25 @@
 #:kivy 2.2.0
+#: set zf_primary: [0.0, 0.34, 0.72, 1]           # ZF-Blau (#0057B7)
+#: set zf_background: [0.898, 0.91, 0.941, 1]     # Hellgrau (#E5E9F0)
+#: set zf_text: [0.118, 0.118, 0.118, 1]          # Dunkelgrau (#1E1E1E)
+#: set zf_success: [0.102, 0.737, 0.612, 1]       # Grün (#1ABC9C)
+#: set zf_error: [0.839, 0.153, 0.157, 1]         # Rot (#D62828)
+
+<Button>:
+    size_hint: 0.8, None
+    height: 50
+    background_normal: ''
+    background_color: zf_background
+    color: zf_text
+    pos_hint: {'center_x': 0.5}
+
+<Label>:
+    font_size: 24
+    color: zf_primary
 
 BoxLayout:
     orientation: 'vertical'
 
-    ThemeWidget:
-        id: theme
-        opacity: 0  # unsichtbar, speichert Farben global
-
-    ScreenManager:
-        id: screenmanager
+ScreenManager:
+    mainscreen:
+    adminscreen:
