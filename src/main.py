@@ -10,7 +10,7 @@ from core.account_manager import AccountManager
 
 kivy.require("2.3.0")
 #Window.size = (800, 480)
-Window.size = 'auto'
+Window.fullscreen='auto'
 
 class KaffeeKasseApp(App):
     def build(self):
