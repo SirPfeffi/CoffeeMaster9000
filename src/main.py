@@ -20,7 +20,6 @@ Window.size = (800, 480)
 class RootManager(ScreenManager):
     theme = ObjectProperty(None)
 
-
 class CoffeeMasterApp(App):
     def build(self):
 
@@ -29,13 +28,14 @@ class CoffeeMasterApp(App):
         Builder.load_file("src/gui/mainscreen.kv")
         Builder.load_file("src/gui/adminscreen.kv")
         
-        root = Builder.load_file("src/gui/main.kv")       
+        root = Builder.load_file("src/gui/main.kv")
+        screen_manager = root.ids.screenmanager
 
         # Screens hinzufügen
-        self.mainscreen = root.get_screen("mainscreen")
-        self.adminscreen = root.get_screen("adminscreen")
+        self.mainscreen = screen_manager.get_screen("mainscreen")
+        self.adminscreen = screen_manager.get_screen("adminscreen")
 
-        root.theme = root.ids.theme
+        #root.theme = root.ids.theme
 
         # Manager für Logik
         self.account_manager = AccountManager()

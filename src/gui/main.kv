@@ -1,15 +1,15 @@
 #:kivy 2.2.0
 
-ScreenManager:
-    id: screenmanager
+BoxLayout:
+    orientation: 'vertical'
 
-    # globales Theme-Widget
     ThemeWidget:
         id: theme
         opacity: 0  # unsichtbar, speichert Farben global
 
-    MainScreen:
-        name: "mainscreen"
-
-    AdminScreen:
-        name: "adminscreen"
+    ScreenManager:
+        id: screenmanager
+        MainScreen:
+            name: "mainscreen"
+        AdminScreen:
+            name: "adminscreen"
