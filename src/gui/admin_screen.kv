@@ -3,7 +3,37 @@
         orientation: "vertical"
         Label:
             text: root.stats_text
+
+        GridLayout:
+            cols: 2
+            spacing: dp(10)
+            size_hint_y: None
+            height: self.minimum_height
+
+            Button:
+                text: "Benutzerverwaltung"
+                background_color: 0.898, 0.91, 0.941, 1
+                color: [1, 1, 1, 1]
+
+            Button:
+                text: "Kassensaldo anzeigen"
+                background_color: 0.898, 0.91, 0.941, 1
+                color: [1, 1, 1, 1]
+
+            Button:
+                text: "Einzahlung buchen"
+                background_color: 0.102, 0.737, 0.612, 1
+                color: [1, 1, 1, 1]
+
+            Button:
+                text: "Fehlbuchung stornieren"
+                background_color: 0.839, 0.153, 0.157, 1
+                color: [1, 1, 1, 1]
+
         Button:
-            text: "Zurück"
-            size_hint_y: 0.15
-            on_press: app.root.get_screen('main').reset_screen()
+            text: "Zurück zum Hauptbildschirm"
+            background_color: 0.898, 0.91, 0.941, 1
+            color: [1, 1, 1, 1]
+            size_hint_y: None
+            height: dp(50)
+            on_release: app.root.get_screen('main').reset_screen()
