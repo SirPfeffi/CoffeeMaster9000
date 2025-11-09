@@ -1,42 +1,82 @@
-<MainScreen>:
-    name: "mainscreen"
 
+#:import dp kivy.metrics.dp
+<MainScreen>:
     canvas.before:
         Color:
-            rgba: (0.1, 0.5, 0.9, 1)
+            rgba: 0.96,0.96,0.97,1
         Rectangle:
             pos: self.pos
             size: self.size
-
     BoxLayout:
-        orientation: "vertical"
-        spacing: dp(20)
-        padding: dp(40)
-
-        Label:
-            text: "Willkommen beim CoffeeMaster 9000"
-            font_size: "24sp"
-            bold: True
-
-        TextInput:
-            id: uid_input
-            hint_text: "Beispiel: 04A1B2C3D4"
-            multiline: False
+        orientation: 'vertical'
+        padding: dp(18)
+        spacing: dp(12)
+        BoxLayout:
             size_hint_y: None
-            height: dp(48)
-            background_color: [1, 1, 1, 1]
-            foreground_color: [0.5, 0.5, 0.5, 1]
-            on_focus:
-                if self.focus: self.text = "" if self.text == self.hint_text else self.text
-
-        Button:
-            text: "Login"
+            height: dp(80)
+            Label:
+                text: "CoffeeMaster9000"
+                font_size: '28sp'
+                bold: True
+                color: 0.12,0.12,0.12,1
+        BoxLayout:
+            size_hint_y: None
+            height: dp(120)
+            spacing: dp(12)
+            canvas.before:
+                Color:
+                    rgba: 1,1,1,1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [12,]
+            BoxLayout:
+                orientation: 'vertical'
+                padding: dp(12)
+                Label:
+                    id: user_label
+                    text: root.current_user_name
+                    font_size: '22sp'
+                    color: 0.1,0.1,0.1,1
+                Label:
+                    id: balance_label
+                    text: root.current_user_balance
+                    font_size: '20sp'
+                    color: 0.2,0.6,0.2,1
+        BoxLayout:
+            size_hint_y: None
+            height: dp(80)
+            spacing: dp(12)
+            Button:
+                text: "Kaffee buchen"
+                on_press: root.book_coffee()
+                background_normal: ''
+                background_color: 0.09,0.59,0.53,1
+                color: 1,1,1,1
+            Button:
+                text: "Einzahlen 1.00 €"
+                on_press: root.deposit('1.00')
+                background_normal: ''
+                background_color: 0.2,0.6,0.86,1
+                color: 1,1,1,1
+        BoxLayout:
             size_hint_y: None
             height: dp(50)
-            on_release: app.on_rfid_scan(uid_input.text)
-
-        Button:
-            text: "Adminmodus (Test)"
+            TextInput:
+                id: uid_input
+                hint_text: "UID (Simulation)"
+                multiline: False
+                on_text_validate: root.load_user(root.ids.uid_input.text)
+        BoxLayout:
             size_hint_y: None
             height: dp(50)
-            on_release: app.root.current = "adminscreen"
+            Label:
+                id: feedback
+                text: root.feedback
+                size_hint_x: 1
+                canvas.before:
+                    Color:
+                        rgba: (0.65,0.95,0.65,1) if root.feedback_color == '#a6e6a6' else ((0.97,0.65,0.65,1) if root.feedback_color == '#f7a6a6' else (1,1,1,0))
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
