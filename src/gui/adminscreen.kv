@@ -3,7 +3,7 @@
 
     canvas.before:
         Color:
-            rgba: root.manager.theme.background
+            rgba: app.root.ids.theme.background
         Rectangle:
             pos: self.pos
             size: self.size
@@ -15,7 +15,7 @@
 
         Label:
             text: "Adminbereich – CoffeeMaster 9000"
-            color: root.manager.theme.text
+            color: app.root.ids.theme.text
             font_size: "24sp"
             bold: True
 
@@ -27,27 +27,27 @@
 
             Button:
                 text: "Benutzerverwaltung"
-                background_color: root.manager.theme.primary
+                background_color: app.root.ids.theme.primary
                 color: [1, 1, 1, 1]
 
             Button:
                 text: "Kassensaldo anzeigen"
-                background_color: root.manager.theme.primary
+                background_color: app.root.ids.theme.primary
                 color: [1, 1, 1, 1]
 
             Button:
                 text: "Einzahlung buchen"
-                background_color: root.manager.theme.success
+                background_color: app.root.ids.theme.success
                 color: [1, 1, 1, 1]
 
             Button:
                 text: "Fehlbuchung stornieren"
-                background_color: root.manager.theme.error
+                background_color: app.root.ids.theme.error
                 color: [1, 1, 1, 1]
 
         Button:
             text: "Zurück zum Hauptbildschirm"
-            background_color: root.manager.theme.primary
+            background_color: app.root.ids.theme.primary
             color: [1, 1, 1, 1]
             size_hint_y: None
             height: dp(50)
