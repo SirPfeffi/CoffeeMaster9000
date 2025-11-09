@@ -2,11 +2,6 @@
 #:import dp kivy.metrics.dp
 
 <MainScreen@ZFTheme>:
-    zf_primary: [0.0, 0.34, 0.72, 1]      # ZF Blau
-    zf_bg: [0.90, 0.91, 0.94, 1]          # Hellgrau
-    zf_text: [0.12, 0.12, 0.12, 1]        # Dunkelgrau
-    zf_success: [0.10, 0.73, 0.61, 1]     # Grünlich
-    zf_error: [0.83, 0.15, 0.16, 1]       # Rot
     name: "main_screen"
 
     canvas.before:
@@ -44,7 +39,8 @@
             height: dp(48)
             background_color: [1, 1, 1, 1]
             foreground_color: root.zf_text
-            on_focus: if self.focus: self.text = "" if self.text == self.hint_text else self.text
+            on_focus:
+                if self.focus: self.text = "" if self.text == self.hint_text else self.text
 
         BoxLayout:
             size_hint_y: None

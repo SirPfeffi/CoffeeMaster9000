@@ -1,14 +1,6 @@
 #:kivy 2.2.0
 #:import dp kivy.metrics.dp
 
-# Lokales ZF Theme (identisch mit mainscreen.kv)
-<ZFTheme@BoxLayout>:
-    zf_primary: [0.0, 0.34, 0.72, 1]      # ZF Blau
-    zf_bg: [0.90, 0.91, 0.94, 1]          # Hellgrau
-    zf_text: [0.12, 0.12, 0.12, 1]        # Dunkelgrau
-    zf_success: [0.10, 0.73, 0.61, 1]     # Grünlich
-    zf_error: [0.83, 0.15, 0.16, 1]       # Rot
-
 <AdminScreen@ZFTheme>:
     name: "admin_screen"
 
@@ -24,7 +16,7 @@
         spacing: dp(20)
         padding: dp(40)
 
-        # Kopfzeile mit ZF Logo
+        # Kopfbereich mit Logo und Titel
         BoxLayout:
             orientation: "horizontal"
             size_hint_y: None
@@ -33,61 +25,54 @@
 
             Image:
                 source: "assets/zf_logo.png"
-                size_hint_x: None
-                width: dp(150)
+                size_hint: (None, None)
+                size: dp(120), dp(80)
                 allow_stretch: True
                 keep_ratio: True
 
             Label:
-                text: "Administratorbereich"
-                font_size: "26sp"
-                bold: True
+                text: "Adminbereich – CoffeeMaster 9000"
                 color: root.zf_text
-                valign: "middle"
+                font_size: "24sp"
+                bold: True
                 halign: "left"
+                valign: "middle"
+                text_size: self.size
 
-        # Admin-Aktionen
+        # Adminfunktionen
         GridLayout:
             cols: 2
             spacing: dp(15)
             size_hint_y: None
             height: self.minimum_height
+            row_default_height: dp(60)
 
             Button:
-                text: "Benutzer hinzufügen"
+                text: "Benutzerverwaltung"
                 background_color: root.zf_primary
                 color: [1, 1, 1, 1]
-                on_release: app.add_user_dialog()
+                on_release: app.open_user_management()
 
             Button:
-                text: "Benutzer entfernen"
+                text: "Kassensaldo anzeigen"
+                background_color: root.zf_primary
+                color: [1, 1, 1, 1]
+                on_release: app.show_balance()
+
+            Button:
+                text: "Einzahlung buchen"
+                background_color: root.zf_success
+                color: [1, 1, 1, 1]
+                on_release: app.add_credit()
+
+            Button:
+                text: "Fehlbuchung stornieren"
                 background_color: root.zf_error
                 color: [1, 1, 1, 1]
-                on_release: app.remove_user_dialog()
+                on_release: app.cancel_transaction()
 
-            Button:
-                text: "Saldo anpassen"
-                background_color: root.zf_primary
-                color: [1, 1, 1, 1]
-                on_release: app.adjust_balance_dialog()
-
-            Button:
-                text: "Transaktionen ansehen"
-                background_color: root.zf_primary
-                color: [1, 1, 1, 1]
-                on_release: app.show_transactions()
-
-            Button:
-                text: "Systemeinstellungen"
-                background_color: root.zf_primary
-                color: [1, 1, 1, 1]
-                on_release: app.show_settings_dialog()
-
-            Button:
-                text: "Abmelden"
-                background_color: root.zf_error
-                color: [1, 1, 1, 1]
-                on_release: app.logout_admin()
+        Widget:
+            size_hint_y: 0.2
 
         # Statusbereich
         Label:
@@ -98,5 +83,11 @@
             halign: "center"
             valign: "middle"
 
-        Widget:
-            size_hint_y: 0.3
+        # Logout-Button
+        Button:
+            text: "Zurück zum Hauptbildschirm"
+            size_hint_y: None
+            height: dp(50)
+            background_color: root.zf_primary
+            color: [1, 1, 1, 1]
+            on_release: app.switch_to_main()
