@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
-from gui.main_screen import MainScreen
+from gui.mainscreen import MainScreen
 from core.rfid_manager import RFIDManager
 from core.account_manager import AccountManager
 
@@ -16,7 +16,6 @@ Window.size = (800, 480)
 
 class KaffeeKasseApp(App):
     def build(self):
-        Builder.load_file("gui/mainscreen.kv")
         self.account_manager = AccountManager()
         self.main_screen = MainScreen()
         self.rfid_manager = RFIDManager()
