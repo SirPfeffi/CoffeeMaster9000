@@ -26,25 +26,15 @@ class CoffeeMasterApp(App):
 
         # KV-Dateien laden
         Builder.load_file("src/gui/theme.kv")
-        
-        root = RootManager(transition=FadeTransition())
-
-        # Theme-Instanz erstellen
-        try:
-            root.theme = Factory.ThemeWidget()
-        except Exception:
-            # Fallback: Theme per dict/list direkt setzen oder erstellen
-            root.theme = Factory.ThemeWidget()  # lässt Fehler anzeigen, falls nicht definiert
-
         Builder.load_file("src/gui/mainscreen.kv")
         Builder.load_file("src/gui/adminscreen.kv")
+        
+        root = RootManager(transition=FadeTransition())
+        root = Builder.load_file("src/gui/main.kv")       
 
         # Screens hinzufügen
-        self.mainscreen = MainScreen(name="mainscreen")
-        self.adminscreen = AdminScreen(name="adminscreen")
-
-        root.add_widget(self.mainscreen)
-        root.add_widget(self.adminscreen)
+        self.mainscreen = root.get_screen("mainscreen")
+        self.adminscreen = root.get_screen("adminscreen")
 
         # Manager für Logik
         self.account_manager = AccountManager()

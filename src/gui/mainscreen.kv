@@ -3,7 +3,7 @@
 
     canvas.before:
         Color:
-            rgba: root.manager.theme.background
+            rgba: root.manager.ids.theme.background
         Rectangle:
             pos: self.pos
             size: self.size
@@ -15,7 +15,7 @@
 
         Label:
             text: "Willkommen beim CoffeeMaster 9000"
-            color: root.manager.theme.text
+            color: root.manager.ids.theme.background
             font_size: "24sp"
             bold: True
 
@@ -26,13 +26,13 @@
             size_hint_y: None
             height: dp(48)
             background_color: [1, 1, 1, 1]
-            foreground_color: root.manager.theme.text
+            foreground_color: root.manager.ids.theme.background
             on_focus:
                 if self.focus: self.text = "" if self.text == self.hint_text else self.text
 
         Button:
             text: "Login"
-            background_color: root.manager.theme.primary
+            background_color: root.manager.ids.theme.background
             color: [1, 1, 1, 1]
             size_hint_y: None
             height: dp(50)
@@ -40,7 +40,7 @@
 
         Button:
             text: "Adminmodus (Test)"
-            background_color: root.manager.theme.success
+            background_color: root.manager.ids.theme.background
             color: [1, 1, 1, 1]
             size_hint_y: None
             height: dp(50)
