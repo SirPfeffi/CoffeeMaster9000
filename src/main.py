@@ -56,7 +56,7 @@ class CoffeeMasterApp(App):
             print("→ Adminmodus aktiviert")
             self.root.current = "adminscreen"
         else:
-            self.root.getscreen("mainscreen").load_account(uid)
+            self.root.get_screen("mainscreen").load_account(uid)
 
     def switch_to_main(self):
         self.root.current = "mainscreen"
