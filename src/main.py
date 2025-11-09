@@ -36,6 +36,7 @@ class CoffeeMasterApp(App):
         # Screens hinzufügen
         self.mainscreen = screen_manager.get_screen("mainscreen")
         self.adminscreen = screen_manager.get_screen("adminscreen")
+        screen_manager.current = "mainscreen"
 
         #root.theme = root.ids.theme
 
