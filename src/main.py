@@ -4,7 +4,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.lang import Builder
 from gui.main_screen import MainScreen
-from gui.admin_screen import MainScreen
+from gui.admin_screen import AdminScreen
 from core.rfid_manager import RFIDManager
 from core.account_manager import AccountManager
 
