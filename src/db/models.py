@@ -2,7 +2,7 @@ from peewee import *
 from datetime import datetime
 import os
 
-DB_PATH = os.environ.get("KAFFEEKASSE_DB", "db/kaffeekasse.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "coffee.db")
 db = SqliteDatabase(DB_PATH, pragmas={"foreign_keys": 1})
 
 class BaseModel(Model):
@@ -13,6 +13,7 @@ class User(BaseModel):
     rfid_uid = CharField(unique=True)
     name = CharField()
     balance_cents = IntegerField(default=0)
+    is_admin = BooleanField(default=False)
 
     @property
     def balance(self) -> float:
@@ -30,4 +31,4 @@ class Transaction(BaseModel):
 
 def init_db():
     db.connect(reuse_if_open=True)
-    db.create_tables([User, Transaction])
+    db.create_tables([User, Transaction], safe=True)
