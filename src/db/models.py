@@ -2,7 +2,11 @@ from peewee import *
 from datetime import datetime
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "coffee.db")
+# Sicherstellen, dass das data-Verzeichnis existiert
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+DB_PATH = os.path.join(DATA_DIR, "coffee.db")
 db = SqliteDatabase(DB_PATH, pragmas={"foreign_keys": 1})
 
 class BaseModel(Model):
