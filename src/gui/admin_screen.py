@@ -40,9 +40,11 @@ class AdminScreen(Screen):
 
     def show_user_management(self):
         """Zeigt Benutzerverwaltung an"""
-        # TODO: Implementierung
+        if self.manager:
+            user_mgmt_screen = self.manager.get_screen('user_management')
+            user_mgmt_screen.current_admin = self.current_admin
+            self.manager.current = 'user_management'
         logger.info("Benutzerverwaltung aufgerufen")
-        pass
 
     def show_balance_overview(self):
         """Zeigt Kassensaldo-Übersicht an"""

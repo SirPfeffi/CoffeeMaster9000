@@ -2,6 +2,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.clock import Clock
 from core.account_manager import AccountManager
+from gui.user_registration_dialog import UserRegistrationDialog
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,8 @@ class MainScreen(Screen):
         user = self.am.get_user_by_uid(uid)
         
         if not user:
-            self.show_feedback(f"Unbekannte Karte: {uid}", error=True)
+            # Neue Karte -> Registrierungs-Dialog anzeigen
+            self.show_registration_dialog(uid)
             return
 
         # Admin-Benutzer -> zum Admin-Screen wechseln
@@ -127,3 +129,28 @@ class MainScreen(Screen):
             admin_screen = self.manager.get_screen('admin')
             admin_screen.current_admin = user
             self.manager.current = 'admin'
+    
+    def show_registration_dialog(self, uid):
+        """Zeigt den Registrierungs-Dialog für neue UIDs"""
+        dialog = UserRegistrationDialog(
+            uid=uid,
+            on_register_callback=self.register_new_user
+        )
+        dialog.open()
+    
+    def register_new_user(self, uid, full_name):
+        """Registriert einen neuen Benutzer"""
+        try:
+            user = self.am.create_user(
+                rfid_uid=uid,
+                name=full_name,
+                initial_cents=0,
+                is_admin=False
+            )
+            logger.info("Neuer Benutzer registriert: %s", full_name)
+            self.show_feedback(f"Willkommen, {full_name}!", success=True)
+            # Benutzer direkt laden
+            self.load_user(user)
+        except Exception as e:
+            logger.exception("Fehler bei der Registrierung: %s", e)
+            self.show_feedback("Registrierung fehlgeschlagen", error=True)

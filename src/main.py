@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
 from gui.main_screen import MainScreen
 from gui.admin_screen import AdminScreen
+from gui.user_management_screen import UserManagementScreen
 from core.rfid_manager import RFIDManager
 from core.account_manager import AccountManager
 from db.models import init_db
@@ -37,9 +38,11 @@ class KaffeeKasseApp(App):
         # Screens erstellen und hinzufügen
         self.main_screen = MainScreen(name='main')
         self.admin_screen = AdminScreen(name='admin')
+        self.user_management_screen = UserManagementScreen(name='user_management')
         
         sm.add_widget(self.main_screen)
         sm.add_widget(self.admin_screen)
+        sm.add_widget(self.user_management_screen)
         
         # RFID Manager initialisieren (nur einmal!)
         self.rfid_manager = RFIDManager()
