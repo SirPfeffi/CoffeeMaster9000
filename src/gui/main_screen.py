@@ -47,11 +47,8 @@ class MainScreen(Screen):
 
     def load_user_by_uid(self, uid: str):
         """Lädt Benutzer anhand UID (für Simulation)"""
-        user = self.am.get_user_by_uid(uid)
-        if user:
-            self.on_rfid(uid)
-        else:
-            self.show_feedback(f"Unbekannte UID: {uid}", error=True)
+        # Direkt on_rfid aufrufen, das kümmert sich um alles
+        self.on_rfid(uid)
 
     def book_coffee(self):
         """Bucht einen Kaffee für den aktuellen Benutzer"""
