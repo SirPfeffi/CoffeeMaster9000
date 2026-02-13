@@ -1,0 +1,11 @@
+[Unit]
+Description=CoffeeMaster9000 Daily Backup
+After=network.target
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/opt/coffeemaster9000/src
+Environment=PYTHONPATH=/opt/coffeemaster9000/src
+EnvironmentFile=-/etc/default/coffeemaster9000
+ExecStart=/opt/coffeemaster9000/.venv/bin/python /opt/coffeemaster9000/src/scripts/daily_backup.py

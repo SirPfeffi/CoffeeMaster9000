@@ -1,5 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Startseite</h2>
-<p>Gesamtanzahl gebuchter Kaffees: {{ total_coffee }}</p>
+<h2>{{ tr('index.title') }}</h2>
+<p>{{ tr('index.total_coffee') }}: {{ total_coffee }}</p>
+<table>
+    <tr>
+        <th>{{ tr('common.name') }}</th>
+        <th>{{ tr('common.balance_eur') }}</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.name }}</td>
+        <td>{{ "%.2f"|format(user.balance) }}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

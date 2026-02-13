@@ -1,0 +1,10 @@
+[Unit]
+Description=Run CoffeeMaster9000 backup once daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=coffeemaster-backup.service
+
+[Install]
+WantedBy=timers.target

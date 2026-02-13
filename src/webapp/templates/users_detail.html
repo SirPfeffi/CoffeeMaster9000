@@ -1,26 +1,51 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>{{ user.name }} (ID: {{ user.id }})</h2>
-<p>Guthaben: {{ "%.2f"|format(user.balance) }} €</p>
+<h2>{{ tr('user.title') }}: {{ user.name }} (ID: {{ user.id }})</h2>
+<p>{{ tr('common.balance_eur') }}: {{ "%.2f"|format(user.balance) }}</p>
 
-<h3>Einzahlen</h3>
+<h3>{{ tr('user.deposit') }}</h3>
 <form method="post">
-    <input type="text" name="amount" placeholder="Betrag in €">
-    <button type="submit">Einzahlen</button>
+    <input type="hidden" name="action" value="deposit">
+    <input type="text" name="amount" placeholder="{{ tr('user.amount_eur') }}">
+    <button type="submit">{{ tr('user.deposit') }}</button>
 </form>
 
-<h3>Letzte Buchungen</h3>
+<h3>{{ tr('user.beans_topup') }}</h3>
+<form method="post">
+    <input type="hidden" name="action" value="beans_topup">
+    <input type="number" name="kg" min="1" max="5" placeholder="kg" required>
+    <input type="text" name="amount" placeholder="{{ tr('user.amount_eur') }}" required>
+    <button type="submit">{{ tr('user.beans_topup') }}</button>
+</form>
+
+<h3>{{ tr('user.correction') }}</h3>
+<form method="post">
+    <input type="hidden" name="action" value="correction">
+    <input type="text" name="amount" placeholder="{{ tr('user.amount_eur') }} (+/-)" required>
+    <input type="text" name="reason" placeholder="{{ tr('user.reason') }}" required>
+    <button type="submit">{{ tr('user.correction') }}</button>
+</form>
+
+<h3>{{ tr('user.maintenance') }}</h3>
+<form method="post">
+    <input type="hidden" name="action" value="maintenance">
+    <input type="text" name="amount" placeholder="{{ tr('user.amount_eur') }}" required>
+    <input type="text" name="reason" placeholder="{{ tr('user.reason') }}" required>
+    <button type="submit">{{ tr('user.maintenance') }}</button>
+</form>
+
+<h3>{{ tr('user.bookings') }}</h3>
 <table>
     <tr>
         <th>Datum/Zeit</th>
         <th>Beschreibung</th>
-        <th>Betrag (€)</th>
+        <th>EUR</th>
     </tr>
     {% for t in transactions %}
     <tr>
         <td>{{ t.timestamp.strftime("%d.%m.%Y %H:%M") }}</td>
         <td>{{ t.description }}</td>
-        <td>{{ "%.2f"|format(t.amount) }}</td>
+        <td>{{ "%.2f"|format(t.amount_cents / 100.0) }}</td>
     </tr>
     {% endfor %}
 </table>

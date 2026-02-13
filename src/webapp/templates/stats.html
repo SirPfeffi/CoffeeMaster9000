@@ -1,17 +1,66 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Statistik der letzten 7 Tage</h2>
-<p>Gesamtanzahl Kaffees: {{ total_coffee }}</p>
+<h2>{{ tr('stats.title') }}</h2>
+<p>{{ tr('stats.total') }}: {{ total_coffee }}</p>
+<p><a href="{{ url_for('stats_export') }}">{{ tr('stats.export_csv') }}</a></p>
+
+<h3>Top 3 Konsumenten</h3>
 <table>
-    <tr>
-        <th>Datum</th>
-        <th>Anzahl Kaffees</th>
-    </tr>
-    {% for day, count in daily_counts.items() %}
-    <tr>
-        <td>{{ day }}</td>
-        <td>{{ count }}</td>
-    </tr>
+    <tr><th>Zeitraum</th><th>Name</th><th>Kaffees</th></tr>
+    {% for row in stats.top_week %}
+    <tr><td>Woche</td><td>{{ row.name }}</td><td>{{ row.coffee_total or 0 }}</td></tr>
+    {% endfor %}
+    {% for row in stats.top_month %}
+    <tr><td>Monat</td><td>{{ row.name }}</td><td>{{ row.coffee_total or 0 }}</td></tr>
+    {% endfor %}
+    {% for row in stats.top_year %}
+    <tr><td>Jahr</td><td>{{ row.name }}</td><td>{{ row.coffee_total or 0 }}</td></tr>
+    {% endfor %}
+    {% for row in stats.top_overall %}
+    <tr><td>Overall</td><td>{{ row.name }}</td><td>{{ row.coffee_total or 0 }}</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Top Schuldner</h3>
+<table>
+    <tr><th>Name</th><th>Saldo (EUR)</th></tr>
+    {% for row in stats.debtors %}
+    <tr><td>{{ row.name }}</td><td>{{ "%.2f"|format(row.balance_cents / 100.0) }}</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Kilogramm Bohnen</h3>
+<p>Woche: {{ stats.kg_week }}</p>
+<p>Monat: {{ stats.kg_month }}</p>
+<p>Jahr: {{ stats.kg_year }}</p>
+<p>Overall: {{ stats.kg_overall }}</p>
+
+<h3>Maintenance / Repair Kosten</h3>
+<p>Monat: {{ "%.2f"|format(stats.maintenance_month_cents / 100.0) }} EUR</p>
+<p>Jahr: {{ "%.2f"|format(stats.maintenance_year_cents / 100.0) }} EUR</p>
+<p>Overall: {{ "%.2f"|format(stats.maintenance_overall_cents / 100.0) }} EUR</p>
+
+<h3>Verbrauch nach Tageszeit (Stunde)</h3>
+<table>
+    <tr><th>Stunde</th><th>Kaffees</th></tr>
+    {% for row in stats.hourly %}
+    <tr><td>{{ row.hour }}</td><td>{{ row.total or 0 }}</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Verbrauch nach Wochentag</h3>
+<table>
+    <tr><th>Wochentag (0=So)</th><th>Kaffees</th></tr>
+    {% for row in stats.weekday %}
+    <tr><td>{{ row.weekday }}</td><td>{{ row.total or 0 }}</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Verbrauch nach Monat</h3>
+<table>
+    <tr><th>Monat</th><th>Kaffees</th></tr>
+    {% for row in stats.monthly %}
+    <tr><td>{{ row.month }}</td><td>{{ row.total or 0 }}</td></tr>
     {% endfor %}
 </table>
 {% endblock %}

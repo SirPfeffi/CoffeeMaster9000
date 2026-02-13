@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
-    <title>Kaffeekasse Admin</title>
+    <title>CoffeeMaster9000</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <h1>Kaffeekasse Admin</h1>
+        <h1>CoffeeMaster9000</h1>
         <nav>
-            <a href="{{ url_for('index') }}">Startseite</a> |
-            <a href="{{ url_for('users') }}">Benutzer</a> |
-            <a href="{{ url_for('stats') }}">Statistik</a> |
-            <a href="{{ url_for('backup') }}">Backup</a>
+            <a href="{{ url_for('index') }}">{{ tr('nav.home') }}</a> |
+            {% if is_admin %}
+            <a href="{{ url_for('users') }}">{{ tr('nav.users') }}</a> |
+            <a href="{{ url_for('stats') }}">{{ tr('nav.stats') }}</a> |
+            <a href="{{ url_for('backup') }}">{{ tr('nav.backup') }}</a> |
+            <a href="{{ url_for('integrations') }}">{{ tr('nav.integrations') }}</a> |
+            <a href="{{ url_for('logout') }}">{{ tr('nav.logout') }}</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">{{ tr('nav.admin_login') }}</a>
+            {% endif %}
+            |
+            <a href="{{ url_for('switch_lang', code='de') }}">{{ tr('lang.de') }}</a> /
+            <a href="{{ url_for('switch_lang', code='en') }}">{{ tr('lang.en') }}</a>
         </nav>
         <hr>
         {% with messages = get_flashed_messages(with_categories=true) %}

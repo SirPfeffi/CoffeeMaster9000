@@ -1,19 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Benutzerliste</h2>
+<h2>{{ tr('users.title') }}</h2>
 <table>
     <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Guthaben (€)</th>
-        <th>Aktionen</th>
+        <th>{{ tr('users.id') }}</th>
+        <th>{{ tr('common.name') }}</th>
+        <th>{{ tr('common.balance_eur') }}</th>
+        <th>{{ tr('users.actions') }}</th>
     </tr>
     {% for user in users %}
     <tr>
         <td>{{ user.id }}</td>
         <td>{{ user.name }}</td>
         <td>{{ "%.2f"|format(user.balance) }}</td>
-        <td><a href="{{ url_for('user_detail', user_id=user.id) }}">Details</a></td>
+        <td><a href="{{ url_for('user_detail', user_id=user.id) }}">{{ tr('users.details') }}</a></td>
     </tr>
     {% endfor %}
 </table>

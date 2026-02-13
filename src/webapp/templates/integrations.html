@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>{{ tr('integration.title') }}</h2>
+
+<h3>{{ tr('integration.we8.title') }}</h3>
+<p>{{ tr('integration.we8.enabled') }}: {{ we8_status.enabled }}</p>
+<p>{{ tr('integration.we8.configured') }}: {{ we8_status.configured }}</p>
+<p>{{ tr('integration.we8.connected') }}: {{ we8_status.connected }}</p>
+<p>{{ tr('integration.we8.message') }}: {{ we8_status.message }}</p>
+<p>{{ tr('integration.we8.last_checked') }}: {{ we8_status.last_checked_at }}</p>
+<p>{{ tr('integration.we8.last_polled') }}: {{ we8_status.last_polled_at }}</p>
+<p>{{ tr('integration.we8.last_counter') }}: {{ we8_status.last_brew_counter }}</p>
+<p>{{ tr('integration.we8.last_error') }}: {{ we8_status.last_error }}</p>
+<p>{{ tr('integration.we8.brewed_24h') }}: {{ we8_brewed_24h }}</p>
+<p>{{ tr('integration.we8.booked_24h') }}: {{ booked_24h }}</p>
+<p>{{ tr('integration.we8.delta_24h') }}: {{ delta_24h }}</p>
+
+<form method="post" action="{{ url_for('integrations_we8_poll') }}">
+    <button type="submit">{{ tr('integration.we8.poll_now') }}</button>
+</form>
+{% endblock %}

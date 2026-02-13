@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>{{ tr('login.title') }}</h2>
+<form method="post">
+    <label for="username">{{ tr('login.username') }}</label>
+    <input id="username" type="text" name="username" required>
+    <label for="password">{{ tr('login.password') }}</label>
+    <input id="password" type="password" name="password" required>
+    <button type="submit">{{ tr('login.submit') }}</button>
+</form>
+{% endblock %}
