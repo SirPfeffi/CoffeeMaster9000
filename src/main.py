@@ -22,7 +22,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-kivy.require("2.3.0")
+kivy.require("2.3.1")
 Config.set("kivy", "keyboard_mode", "systemanddock")
 Window.fullscreen = "auto"
 

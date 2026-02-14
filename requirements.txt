@@ -1,5 +1,5 @@
-kivy==2.3.0
+kivy==2.3.1
 mfrc522==0.0.7
-spidev==3.6
-Flask==3.0.3
-peewee==3.17.6
+spidev==3.8
+Flask==3.1.2
+peewee==3.19.0

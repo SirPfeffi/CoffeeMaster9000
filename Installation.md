@@ -36,6 +36,8 @@ chmod +x deploy/install_pi.sh
 sudo bash deploy/install_pi.sh
 ```
 
+The installer uses the dedicated Linux user `coffeemaster` for services and creates it automatically if missing.
+
 ## 4. Configure runtime environment
 
 Edit:
@@ -129,7 +131,138 @@ sudo systemctl restart coffeemaster-web.service
 Then open web UI:
 - `http://<raspi-ip>:5000/integrations`
 
-## 7. Start and enable services
+## 7. Backup setup (USB + optional SMB)
+
+Backup implementation in this project:
+- scheduler: `systemd` timer (`coffeemaster-backup.timer`) once daily
+- executor: `coffeemaster-backup.service` -> `src/scripts/daily_backup.py`
+- targets:
+  - USB path from `COFFEEMASTER_USB_BACKUP_PATH` (default `/media/usb`)
+  - optional network path from `COFFEEMASTER_NETWORK_BACKUP_PATH`
+- filename format: `kaffeekasse_backup_YYYYMMDD_HHMMSS.db`
+
+### 7.1 Configure backup paths
+
+Edit:
+
+```bash
+sudo nano /etc/default/coffeemaster9000
+```
+
+Set at least:
+
+```env
+COFFEEMASTER_DB_PATH=/opt/coffeemaster9000/src/data/coffee.db
+COFFEEMASTER_USB_BACKUP_PATH=/media/usb
+COFFEEMASTER_BACKUP_MAX_RETRIES=10
+```
+
+Optional SMB target:
+
+```env
+COFFEEMASTER_NETWORK_BACKUP_PATH=/mnt/smb/coffeemaster
+```
+
+### 7.2 USB backup mount example
+
+Create mountpoint:
+
+```bash
+sudo mkdir -p /media/usb
+```
+
+Find USB device and filesystem UUID:
+
+```bash
+lsblk -f
+```
+
+Add to `/etc/fstab` (example):
+
+```fstab
+UUID=<USB_UUID>  /media/usb  ext4  defaults,nofail,x-systemd.device-timeout=10  0  2
+```
+
+Then:
+
+```bash
+sudo mount -a
+ls -la /media/usb
+```
+
+### 7.3 Optional SMB mount example
+
+Install CIFS tools:
+
+```bash
+sudo apt install -y cifs-utils
+```
+
+Create mountpoint + credentials file:
+
+```bash
+sudo mkdir -p /mnt/smb/coffeemaster
+sudo nano /etc/samba/creds-coffeemaster
+```
+
+Credentials file content:
+
+```txt
+username=<smb_user>
+password=<smb_password>
+domain=<optional_domain>
+```
+
+Protect it:
+
+```bash
+sudo chmod 600 /etc/samba/creds-coffeemaster
+```
+
+Add to `/etc/fstab` (example):
+
+```fstab
+//<server>/<share>  /mnt/smb/coffeemaster  cifs  credentials=/etc/samba/creds-coffeemaster,uid=coffeemaster,gid=coffeemaster,file_mode=0660,dir_mode=0770,iocharset=utf8,nofail,x-systemd.automount  0  0
+```
+
+Then:
+
+```bash
+sudo mount -a
+ls -la /mnt/smb/coffeemaster
+```
+
+### 7.4 Scheduler: systemd timer vs cron
+
+Current installation uses `systemd` timer:
+- `coffeemaster-backup.timer` (`OnCalendar=daily`)
+- `coffeemaster-backup.service`
+
+Legacy file `src/scripts/cronjob-settings.txt` is only reference material and is not installed automatically.
+
+### 7.5 Backup verification
+
+Run manual backup job:
+
+```bash
+sudo systemctl start coffeemaster-backup.service
+```
+
+Check timer and last runs:
+
+```bash
+systemctl status coffeemaster-backup.timer --no-pager
+journalctl -u coffeemaster-backup.service -n 100 --no-pager
+```
+
+Check files:
+
+```bash
+ls -lah /media/usb | grep kaffeekasse_backup_ || true
+ls -lah /mnt/smb/coffeemaster | grep kaffeekasse_backup_ || true
+```
+
+## 8. Start and enable services
 
 ```bash
 sudo systemctl daemon-reload
@@ -138,7 +271,7 @@ sudo systemctl restart coffeemaster-web.service
 sudo systemctl restart coffeemaster-backup.timer
 ```
 
-## 8. Verify service health
+## 9. Verify service health
 
 ```bash
 systemctl status coffeemaster-kiosk.service --no-pager
@@ -146,12 +279,12 @@ systemctl status coffeemaster-web.service --no-pager
 systemctl status coffeemaster-backup.timer --no-pager
 ```
 
-## 9. Access web interface
+## 10. Access web interface
 
 - Open: `http://<raspi-ip>:5000`
 - Without RFID hardware attached, kiosk runs in simulation mode and UID can be typed manually.
 
-## 10. Debugging logs
+## 11. Debugging logs
 
 ```bash
 journalctl -u coffeemaster-kiosk.service -f

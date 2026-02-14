@@ -1,1 +1,1 @@
-0 2 * * * /usr/bin/python3 /home/pi/kaffeekasse_v1/scripts/daily_backup.py
+0 2 * * * /opt/coffeemaster9000/.venv/bin/python /opt/coffeemaster9000/src/scripts/daily_backup.py

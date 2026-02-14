@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_DIR="/opt/coffeemaster9000"
-APP_USER="pi"
+APP_USER="coffeemaster"
 PYTHON_BIN="/usr/bin/python3"
 VENV_DIR="${APP_DIR}/.venv"
 
@@ -12,7 +12,16 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 apt-get update
-apt-get install -y python3 python3-venv python3-pip sqlite3 git
+apt-get install -y python3 python3-dev python3-venv python3-pip build-essential sqlite3 git
+
+if ! id -u "${APP_USER}" >/dev/null 2>&1; then
+  useradd -m -s /bin/bash "${APP_USER}"
+fi
+for grp in spi gpio input video; do
+  if getent group "${grp}" >/dev/null 2>&1; then
+    usermod -aG "${grp}" "${APP_USER}"
+  fi
+done
 
 mkdir -p "${APP_DIR}"
 cp -r . "${APP_DIR}"
