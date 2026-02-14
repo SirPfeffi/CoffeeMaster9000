@@ -144,7 +144,7 @@
             Button:
                 text: root.tr('gui.beans_book')
                 size_hint_x: 0.38
-                on_press: root.submit_bean_topup_and_clear(bean_amount_input)
+                on_press: root.submit_bean_topup(bean_amount_input.text)
                 background_normal: ''
                 background_color: 0.2, 0.6, 0.86, 1
                 color: 1, 1, 1, 1
@@ -157,7 +157,7 @@
             TextInput:
                 hint_text: root.tr('gui.uid_simulation_hint')
                 multiline: False
-                on_text_validate: root.load_user_by_uid_and_clear(self)
+                on_text_validate: root.load_user_by_uid(self.text)
                 font_size: '16sp'
 
         BoxLayout:
