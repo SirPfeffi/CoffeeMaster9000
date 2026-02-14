@@ -77,7 +77,7 @@
                 size_hint_x: 0.2
                 on_press: root.decrease_coffee_count()
             Label:
-                text: f"{root.tr('gui.coffees_label')}: {root.coffee_count}"
+                text: "{}: {}".format(root.tr('gui.coffees_label'), root.coffee_count)
                 size_hint_x: 0.6
                 font_size: '20sp'
             Button:
@@ -144,7 +144,7 @@
             Button:
                 text: root.tr('gui.beans_book')
                 size_hint_x: 0.38
-                on_press: root.submit_bean_topup(bean_amount_input.text); bean_amount_input.text = ''
+                on_press: root.submit_bean_topup_and_clear(bean_amount_input)
                 background_normal: ''
                 background_color: 0.2, 0.6, 0.86, 1
                 color: 1, 1, 1, 1
@@ -157,7 +157,7 @@
             TextInput:
                 hint_text: root.tr('gui.uid_simulation_hint')
                 multiline: False
-                on_text_validate: root.load_user_by_uid(self.text); self.text = ''
+                on_text_validate: root.load_user_by_uid_and_clear(self)
                 font_size: '16sp'
 
         BoxLayout:
@@ -188,7 +188,7 @@
                 color: 0.1, 0.1, 0.1, 1
                 canvas.before:
                     Color:
-                        rgba: (0.65, 0.95, 0.65, 1) if root.feedback_color == '#a6e6a6' else ((0.97, 0.65, 0.65, 1) if root.feedback_color == '#f7a6a6' else (1, 1, 1, 0))
+                        rgba: root.feedback_rgba
                     RoundedRectangle:
                         pos: self.pos
                         size: self.size

@@ -37,6 +37,9 @@ sudo bash deploy/install_pi.sh
 ```
 
 The installer uses the dedicated Linux user `coffeemaster` for services and creates it automatically if missing.
+It also configures autologin for `coffeemaster`:
+- LightDM snippet: `/etc/lightdm/lightdm.conf.d/50-coffeemaster-autologin.conf`
+- tty fallback: `/etc/systemd/system/getty@tty1.service.d/autologin.conf`
 
 ## 4. Configure runtime environment
 

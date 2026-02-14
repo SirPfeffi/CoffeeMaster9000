@@ -1,5 +1,5 @@
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import ListProperty, NumericProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 import logging
 import os
@@ -21,6 +21,7 @@ class MainScreen(Screen):
     balance_notice = StringProperty("")
     feedback = StringProperty("")
     feedback_color = StringProperty("")
+    feedback_rgba = ListProperty([1, 1, 1, 0])
     coffee_count = NumericProperty(1)
     selected_kg = NumericProperty(1)
     fun_text = StringProperty("")
@@ -74,6 +75,12 @@ class MainScreen(Screen):
 
     def load_user_by_uid(self, uid: str):
         self.on_rfid(uid)
+
+    def load_user_by_uid_and_clear(self, text_input_widget):
+        uid = text_input_widget.text.strip()
+        text_input_widget.text = ""
+        if uid:
+            self.load_user_by_uid(uid)
 
     def increase_coffee_count(self):
         if self.coffee_count < CONFIG.max_coffees_per_booking:
@@ -163,20 +170,29 @@ class MainScreen(Screen):
             logger.exception("Error during bean top-up: %s", exc)
             self.show_feedback(str(exc), error=True)
 
+    def submit_bean_topup_and_clear(self, text_input_widget):
+        amount = text_input_widget.text
+        self.submit_bean_topup(amount)
+        text_input_widget.text = ""
+
     def show_feedback(self, message, success=False, error=False, timeout=3):
         self.feedback = message
         if success:
             self.feedback_color = "#a6e6a6"
+            self.feedback_rgba = [0.65, 0.95, 0.65, 1]
         elif error:
             self.feedback_color = "#f7a6a6"
+            self.feedback_rgba = [0.97, 0.65, 0.65, 1]
         else:
             self.feedback_color = ""
+            self.feedback_rgba = [1, 1, 1, 0]
         if timeout and timeout > 0:
             Clock.schedule_once(lambda dt: self.clear_feedback(), timeout)
 
     def clear_feedback(self):
         self.feedback = ""
         self.feedback_color = ""
+        self.feedback_rgba = [1, 1, 1, 0]
 
     def schedule_return(self, seconds=5):
         if self._auto_return_ev:
@@ -193,6 +209,7 @@ class MainScreen(Screen):
         self.balance_notice = ""
         self.feedback = ""
         self.feedback_color = ""
+        self.feedback_rgba = [1, 1, 1, 0]
         self._last_user = None
         self.coffee_count = 1
         self.selected_kg = 1
