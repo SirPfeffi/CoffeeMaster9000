@@ -40,6 +40,8 @@ The installer uses the dedicated Linux user `coffeemaster` for services and crea
 It also configures autologin for `coffeemaster`:
 - LightDM snippet: `/etc/lightdm/lightdm.conf.d/50-coffeemaster-autologin.conf`
 - tty fallback: `/etc/systemd/system/getty@tty1.service.d/autologin.conf`
+- Default install path is the current repository directory (for example `/home/coffeemaster/Coffeemaster9000`).
+- Optional: install to a different path via `sudo APP_DIR=/opt/coffeemaster9000 bash deploy/install_pi.sh`.
 
 ## 4. Configure runtime environment
 
@@ -155,7 +157,7 @@ sudo nano /etc/default/coffeemaster9000
 Set at least:
 
 ```env
-COFFEEMASTER_DB_PATH=/opt/coffeemaster9000/src/data/coffee.db
+COFFEEMASTER_DB_PATH=/home/coffeemaster/Coffeemaster9000/src/data/coffee.db
 COFFEEMASTER_USB_BACKUP_PATH=/media/usb
 COFFEEMASTER_BACKUP_MAX_RETRIES=10
 ```
