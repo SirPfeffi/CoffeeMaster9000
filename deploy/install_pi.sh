@@ -7,6 +7,7 @@ SOURCE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 APP_DIR="${APP_DIR:-${SOURCE_DIR}}"
 APP_USER="${APP_USER:-coffeemaster}"
 PYTHON_BIN="${PYTHON_BIN:-/usr/bin/python3}"
+ENABLE_TTY_AUTOLOGIN="${ENABLE_TTY_AUTOLOGIN:-0}"
 VENV_DIR="${APP_DIR}/.venv"
 ENV_FILE="/etc/default/coffeemaster9000"
 
@@ -37,7 +38,12 @@ for grp in spi gpio input video render; do
   fi
 done
 
-# Ensure autologin for dedicated kiosk user (desktop and tty fallback).
+# Ensure graphical autologin for dedicated kiosk user.
+if command -v raspi-config >/dev/null 2>&1; then
+  # B4 = Desktop autologin on Raspberry Pi OS.
+  raspi-config nonint do_boot_behaviour B4 || true
+fi
+
 if [[ -d /etc/lightdm/lightdm.conf.d || -f /etc/lightdm/lightdm.conf ]]; then
   mkdir -p /etc/lightdm/lightdm.conf.d
   cat > /etc/lightdm/lightdm.conf.d/50-coffeemaster-autologin.conf <<EOF
@@ -62,14 +68,25 @@ autologin-user-timeout=0
 EOF
     fi
   fi
+
+  if systemctl list-unit-files lightdm.service >/dev/null 2>&1; then
+    systemctl enable lightdm.service || true
+  fi
+  systemctl set-default graphical.target || true
+else
+  echo "Warning: LightDM not detected. Install Raspberry Pi OS Desktop/LightDM for graphical autologin."
 fi
 
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf <<EOF
+if [[ "${ENABLE_TTY_AUTOLOGIN}" == "1" ]]; then
+  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf <<EOF
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin ${APP_USER} --noclear %I \$TERM
 EOF
+else
+  rm -f /etc/systemd/system/getty@tty1.service.d/autologin.conf || true
+fi
 
 # Optionally deploy to another directory (e.g. APP_DIR=/opt/coffeemaster9000).
 if [[ "${APP_DIR}" != "${SOURCE_DIR}" ]]; then
@@ -86,20 +103,23 @@ sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install -r "${APP_DIR}/requirements.
 cat > /etc/systemd/system/coffeemaster-kiosk.service <<EOF
 [Unit]
 Description=CoffeeMaster9000 Kiosk App
-After=network.target
+After=network.target display-manager.service
+Wants=display-manager.service
 
 [Service]
 Type=simple
 User=${APP_USER}
 WorkingDirectory=${APP_DIR}/src
 Environment=PYTHONPATH=${APP_DIR}/src
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/${APP_USER}/.Xauthority
 EnvironmentFile=-${ENV_FILE}
 ExecStart=${APP_DIR}/.venv/bin/python ${APP_DIR}/src/main.py
 Restart=always
 RestartSec=3
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
 EOF
 
 cat > /etc/systemd/system/coffeemaster-web.service <<EOF

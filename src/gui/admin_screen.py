@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class AdminScreen(Screen):
+    gui_lang = StringProperty(DEFAULT_LANG)
     stats_text = StringProperty("")
 
     def __init__(self, **kwargs):
@@ -29,7 +30,10 @@ class AdminScreen(Screen):
             self.gui_lang = DEFAULT_LANG
 
     def tr(self, key: str, fallback: str = None):
-        return translate(key, self.gui_lang, fallback=fallback or key)
+        lang = getattr(self, "gui_lang", DEFAULT_LANG)
+        if lang not in SUPPORTED_LANGS:
+            lang = DEFAULT_LANG
+        return translate(key, lang, fallback=fallback or key)
 
     def on_pre_enter(self):
         self.update_stats()

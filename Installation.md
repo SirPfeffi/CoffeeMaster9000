@@ -39,7 +39,8 @@ sudo bash deploy/install_pi.sh
 The installer uses the dedicated Linux user `coffeemaster` for services and creates it automatically if missing.
 It also configures autologin for `coffeemaster`:
 - LightDM snippet: `/etc/lightdm/lightdm.conf.d/50-coffeemaster-autologin.conf`
-- tty fallback: `/etc/systemd/system/getty@tty1.service.d/autologin.conf`
+- tty autologin is disabled by default; enable only if needed via `ENABLE_TTY_AUTOLOGIN=1`
+- kiosk service is bound to graphical startup (`graphical.target`)
 - Default install path is the current repository directory (for example `/home/coffeemaster/Coffeemaster9000`).
 - Optional: install to a different path via `sudo APP_DIR=/opt/coffeemaster9000 bash deploy/install_pi.sh`.
 

@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class MainScreen(Screen):
+    gui_lang = StringProperty(DEFAULT_LANG)
     current_user_name = StringProperty("")
     current_user_balance = StringProperty("")
     recent_bookings = StringProperty("")
@@ -45,7 +46,10 @@ class MainScreen(Screen):
         self._fun_rotation_ev = Clock.schedule_interval(lambda dt: self.rotate_fun_text(), 30)
 
     def tr(self, key: str, fallback: str = None) -> str:
-        return translate(key, self.gui_lang, fallback=fallback or key)
+        lang = getattr(self, "gui_lang", DEFAULT_LANG)
+        if lang not in SUPPORTED_LANGS:
+            lang = DEFAULT_LANG
+        return translate(key, lang, fallback=fallback or key)
 
     def rotate_fun_text(self, force: bool = False):
         if force or self._last_user is None:
