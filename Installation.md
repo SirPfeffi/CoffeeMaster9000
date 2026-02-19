@@ -40,7 +40,8 @@ The installer uses the dedicated Linux user `coffeemaster` for services and crea
 It also configures autologin for `coffeemaster`:
 - LightDM snippet: `/etc/lightdm/lightdm.conf.d/50-coffeemaster-autologin.conf`
 - tty autologin is disabled by default; enable only if needed via `ENABLE_TTY_AUTOLOGIN=1`
-- kiosk service is bound to graphical startup (`graphical.target`)
+- kiosk launches from desktop autostart by default: `/home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop`
+- optional legacy mode via systemd service: `KIOSK_LAUNCH_MODE=systemd`
 - Default install path is the current repository directory (for example `/home/coffeemaster/Coffeemaster9000`).
 - Optional: install to a different path via `sudo APP_DIR=/opt/coffeemaster9000 bash deploy/install_pi.sh`.
 
@@ -272,7 +273,6 @@ ls -lah /mnt/smb/coffeemaster | grep kaffeekasse_backup_ || true
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl restart coffeemaster-kiosk.service
 sudo systemctl restart coffeemaster-web.service
 sudo systemctl restart coffeemaster-backup.timer
 ```
@@ -280,9 +280,14 @@ sudo systemctl restart coffeemaster-backup.timer
 ## 9. Verify service health
 
 ```bash
-systemctl status coffeemaster-kiosk.service --no-pager
 systemctl status coffeemaster-web.service --no-pager
 systemctl status coffeemaster-backup.timer --no-pager
+```
+
+Kiosk autostart verification:
+
+```bash
+ls -l /home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop
 ```
 
 ## 10. Access web interface
@@ -293,7 +298,7 @@ systemctl status coffeemaster-backup.timer --no-pager
 ## 11. Debugging logs
 
 ```bash
-journalctl -u coffeemaster-kiosk.service -f
+journalctl --user -b | grep -i coffeemaster -n || true
 journalctl -u coffeemaster-web.service -f
 journalctl -u coffeemaster-backup.service -f
 ```

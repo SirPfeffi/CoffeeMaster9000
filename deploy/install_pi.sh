@@ -8,6 +8,7 @@ APP_DIR="${APP_DIR:-${SOURCE_DIR}}"
 APP_USER="${APP_USER:-coffeemaster}"
 PYTHON_BIN="${PYTHON_BIN:-/usr/bin/python3}"
 ENABLE_TTY_AUTOLOGIN="${ENABLE_TTY_AUTOLOGIN:-0}"
+KIOSK_LAUNCH_MODE="${KIOSK_LAUNCH_MODE:-desktop}"
 VENV_DIR="${APP_DIR}/.venv"
 ENV_FILE="/etc/default/coffeemaster9000"
 
@@ -25,6 +26,7 @@ echo "Installing CoffeeMaster9000"
 echo "SOURCE_DIR=${SOURCE_DIR}"
 echo "APP_DIR=${APP_DIR}"
 echo "APP_USER=${APP_USER}"
+echo "KIOSK_LAUNCH_MODE=${KIOSK_LAUNCH_MODE}"
 
 apt-get update
 apt-get install -y python3 python3-dev python3-venv python3-pip build-essential sqlite3 git
@@ -167,12 +169,49 @@ else
   echo "COFFEEMASTER_DB_PATH=${APP_DIR}/src/data/coffee.db" >> "${ENV_FILE}"
 fi
 
+APP_HOME="$(getent passwd "${APP_USER}" | cut -d: -f6)"
+AUTOSTART_DIR="${APP_HOME}/.config/autostart"
+LAUNCHER_DIR="${APP_HOME}/.local/bin"
+LAUNCHER_PATH="${LAUNCHER_DIR}/coffeemaster-kiosk.sh"
+
+mkdir -p "${AUTOSTART_DIR}" "${LAUNCHER_DIR}"
+cat > "${LAUNCHER_PATH}" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+export DISPLAY=:0
+export XAUTHORITY=/home/${APP_USER}/.Xauthority
+export PYTHONPATH=${APP_DIR}/src
+if [[ -f ${ENV_FILE} ]]; then
+  set -a
+  . ${ENV_FILE}
+  set +a
+fi
+cd ${APP_DIR}/src
+exec ${APP_DIR}/.venv/bin/python ${APP_DIR}/src/main.py
+EOF
+chmod 0755 "${LAUNCHER_PATH}"
+
+cat > "${AUTOSTART_DIR}/coffeemaster-kiosk.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=CoffeeMaster9000 Kiosk
+Exec=${LAUNCHER_PATH}
+Terminal=false
+X-GNOME-Autostart-enabled=true
+EOF
+chown -R "${APP_USER}:${APP_USER}" "${AUTOSTART_DIR}" "${LAUNCHER_DIR}"
+
 systemctl daemon-reload
-systemctl enable coffeemaster-kiosk.service
+if [[ "${KIOSK_LAUNCH_MODE}" == "systemd" ]]; then
+  systemctl enable coffeemaster-kiosk.service
+  systemctl restart coffeemaster-kiosk.service
+else
+  systemctl disable coffeemaster-kiosk.service || true
+  systemctl stop coffeemaster-kiosk.service || true
+fi
 systemctl enable coffeemaster-web.service
 systemctl enable coffeemaster-backup.timer
-systemctl restart coffeemaster-kiosk.service
 systemctl restart coffeemaster-web.service
 systemctl restart coffeemaster-backup.timer
 
-echo "Installation complete. APP_DIR=${APP_DIR}"
+echo "Installation complete. APP_DIR=${APP_DIR} KIOSK_LAUNCH_MODE=${KIOSK_LAUNCH_MODE}"
