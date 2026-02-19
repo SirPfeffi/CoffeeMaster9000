@@ -1,9 +1,26 @@
 import logging
+import os
 
 import kivy
+from kivy.config import Config
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+kivy.require("2.3.1")
+keyboard_mode = os.environ.get("COFFEEMASTER_KIVY_KEYBOARD_MODE", "dock").strip().lower()
+if keyboard_mode not in {"system", "dock", "multi", "systemanddock", "systemandmulti"}:
+    logger.warning("Invalid COFFEEMASTER_KIVY_KEYBOARD_MODE=%s; fallback to dock", keyboard_mode)
+    keyboard_mode = "dock"
+Config.set("kivy", "keyboard_mode", keyboard_mode)
+Config.set("kivy", "keyboard_layout", os.environ.get("COFFEEMASTER_KIVY_KEYBOARD_LAYOUT", "qwertz"))
+
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.config import Config
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager
@@ -15,16 +32,7 @@ from gui.admin_screen import AdminScreen
 from gui.main_screen import MainScreen
 from gui.user_management_screen import UserManagementScreen
 
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
-
-kivy.require("2.3.1")
-Config.set("kivy", "keyboard_mode", "systemanddock")
-Window.fullscreen = "auto"
+Window.fullscreen = os.environ.get("COFFEEMASTER_KIVY_FULLSCREEN", "auto")
 
 
 class KaffeeKasseApp(App):

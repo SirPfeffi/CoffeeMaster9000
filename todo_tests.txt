@@ -1,35 +1,8 @@
-USER ACCEPTANCE TESTS
+COFFEEMASTER9000 TEST INDEX
+Last updated: 2026-02-19
 
-[ ] Unknown RFID -> create new user -> user is created and shown with zero balance.
-[ ] Unknown RFID -> link to existing user -> RFID reassigned to selected user.
-[ ] Self-registration disabled -> unknown RFID registration is blocked with message.
-[ ] Coffee booking with counts 1..10 works.
-[ ] Booking count >10 is rejected.
-[ ] Double booking within 5s is blocked.
-[ ] Negative balance allowed after booking.
-[ ] Warning shown immediately when balance < 0 EUR.
-[ ] Strong warning shown when balance <= -25 EUR.
-[ ] Post-booking screen shows last 5 transactions and current balance.
-[ ] Bean top-up: kg buttons (1..5) + amount works.
-[ ] Bean top-up rejects kg > 5.
-[ ] Bean top-up rejects amount > 100 EUR.
-[ ] Duplicate top-up detection triggers inside duplicate window.
-[ ] German/English switch works in web.
-[ ] GUI language follows COFFEEMASTER_GUI_LANG (de/en).
+This test plan is split into:
+- `todo_tests_uat.txt`: Touchscreen/user acceptance tests
+- `todo_tests_admin.txt`: Web/admin, backup/restore, integrations tests
 
-ADMIN FUNCTION TESTS
-
-[ ] Admin login fails with wrong credentials and succeeds with correct credentials.
-[ ] User list and user detail pages load correctly.
-[ ] Deposit action creates transaction and updates balance.
-[ ] Correction action creates correction transaction.
-[ ] Maintenance action creates maintenance transaction.
-[ ] Stats page loads top consumers, debtors, kg stats, maintenance costs.
-[ ] CSV export downloads and contains expected columns/data.
-[ ] Manual backup from /backup works to available target.
-[ ] Backup failure is recorded when target is unavailable.
-[ ] Restore preview shows summary (users, transactions, newest transaction timestamp).
-[ ] Restore confirm restores DB and creates pre-restore snapshot.
-[ ] Integrations page loads WE8 status.
-[ ] WE8 poll works (with COFFEEMASTER_WE8_SIMULATE=1 it should report events).
-[ ] 24h brewed-vs-booked delta is shown on integrations page.
+Run `todo_tests_uat.txt` first, then `todo_tests_admin.txt`.

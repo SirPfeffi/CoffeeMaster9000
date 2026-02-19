@@ -169,6 +169,16 @@ else
   echo "COFFEEMASTER_DB_PATH=${APP_DIR}/src/data/coffee.db" >> "${ENV_FILE}"
 fi
 
+if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_MODE=' "${ENV_FILE}"; then
+  echo "COFFEEMASTER_KIVY_KEYBOARD_MODE=dock" >> "${ENV_FILE}"
+fi
+if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=' "${ENV_FILE}"; then
+  echo "COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=qwertz" >> "${ENV_FILE}"
+fi
+if ! grep -q '^COFFEEMASTER_KIVY_FULLSCREEN=' "${ENV_FILE}"; then
+  echo "COFFEEMASTER_KIVY_FULLSCREEN=auto" >> "${ENV_FILE}"
+fi
+
 APP_HOME="$(getent passwd "${APP_USER}" | cut -d: -f6)"
 AUTOSTART_DIR="${APP_HOME}/.config/autostart"
 LAUNCHER_DIR="${APP_HOME}/.local/bin"

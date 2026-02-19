@@ -42,7 +42,7 @@ It also configures autologin for `coffeemaster`:
 - tty autologin is disabled by default; enable only if needed via `ENABLE_TTY_AUTOLOGIN=1`
 - kiosk launches from desktop autostart by default: `/home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop`
 - optional legacy mode via systemd service: `KIOSK_LAUNCH_MODE=systemd`
-- Default install path is the current repository directory (for example `/home/coffeemaster/Coffeemaster9000`).
+- Default install path is the current repository directory (for example `/home/coffeemaster/CoffeeMaster9000`).
 - Optional: install to a different path via `sudo APP_DIR=/opt/coffeemaster9000 bash deploy/install_pi.sh`.
 
 ## 4. Configure runtime environment
@@ -58,8 +58,14 @@ Minimum recommended values:
 ```env
 KAFFEEKASSE_SECRET=<long-random-secret>
 COFFEEMASTER_GUI_LANG=de
+COFFEEMASTER_KIVY_KEYBOARD_MODE=dock
+COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=qwertz
 COFFEEMASTER_WE8_ENABLED=0
 ```
+
+Touchscreen note:
+- `COFFEEMASTER_KIVY_KEYBOARD_MODE=dock` forces Kivy overlay keyboard for `TextInput` fields.
+- Valid modes: `dock`, `systemanddock`, `system`, `multi`, `systemandmulti`.
 
 For first admin bootstrap (one-time):
 
@@ -159,7 +165,7 @@ sudo nano /etc/default/coffeemaster9000
 Set at least:
 
 ```env
-COFFEEMASTER_DB_PATH=/home/coffeemaster/Coffeemaster9000/src/data/coffee.db
+COFFEEMASTER_DB_PATH=/home/coffeemaster/CoffeeMaster9000/src/data/coffee.db
 COFFEEMASTER_USB_BACKUP_PATH=/media/usb
 COFFEEMASTER_BACKUP_MAX_RETRIES=10
 ```

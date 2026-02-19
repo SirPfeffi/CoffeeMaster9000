@@ -1,0 +1,152 @@
+COFFEEMASTER9000 - ADMIN / WEB / BACKUP / INTEGRATION TESTS
+Last updated: 2026-02-19
+Status: Up to date with current codebase.
+
+USAGE
+- Run after `todo_tests_uat.txt`.
+- Mark test as [x] only when expected result is fully met.
+
+PRECONDITIONS
+[ ] A-P01 Admin user exists and login works.
+[ ] A-P02 Web app reachable at `http://<raspi-ip>:5000`.
+[ ] A-P03 At least one normal test user exists.
+
+ADMIN TESTS
+
+[ ] ADM-01 Admin login fails with wrong credentials and succeeds with correct credentials
+Steps:
+1. Open `/login`.
+2. Try wrong password and submit.
+3. Try correct credentials and submit.
+Expected:
+- Wrong login shows error.
+- Correct login redirects to admin pages.
+
+[ ] ADM-02 User list and user detail pages load
+Steps:
+1. Open `/users`.
+2. Open one user detail page `/users/<id>`.
+Expected:
+- No server errors.
+- User and transaction data visible.
+
+[ ] ADM-03 Deposit action creates transaction and updates balance
+Steps:
+1. In user detail, submit `Deposit` amount `5.00`.
+2. Reload page.
+Expected:
+- Balance +5.00 EUR.
+- New top-up/deposit transaction appears.
+
+[ ] ADM-04 Correction action creates correction transaction
+Steps:
+1. Submit correction amount `-1.23`, reason `UAT correction`.
+2. Reload page.
+Expected:
+- Balance -1.23 EUR.
+- Transaction kind is `correction`.
+
+[ ] ADM-05 Maintenance action creates maintenance transaction
+Steps:
+1. Submit maintenance amount `3.50`, reason `UAT maintenance`.
+2. Reload page.
+Expected:
+- Maintenance transaction exists.
+- User balance unchanged (current behavior: `affects_balance=False`).
+
+[ ] ADM-06 Stats page loads top consumers, debtors, kg stats, maintenance costs
+Steps:
+1. Open `/stats`.
+Expected:
+- All sections render (top lists, debtors, kg, maintenance, hourly/weekday/monthly).
+- No 500 error.
+
+[ ] ADM-07 CSV export downloads with expected columns
+Steps:
+1. Open `/stats`.
+2. Click CSV export.
+3. Open downloaded CSV.
+Expected:
+- Header contains:
+  `timestamp,user,kind,description,amount_cents,coffee_count,kg_bought,reference`
+- Recent transactions are present.
+
+BACKUP / RESTORE TESTS
+
+[ ] ADM-08 Manual backup from /backup succeeds to available target
+Preconditions:
+- USB backup path exists and is writable.
+Steps:
+1. Open `/backup`.
+2. Click `Backup now`.
+3. Refresh file list.
+Expected:
+- Success feedback for usb target.
+- New file `kaffeekasse_backup_YYYYMMDD_HHMMSS.db` exists.
+
+[ ] ADM-09 Backup failure is recorded when target unavailable
+Steps:
+1. Set `COFFEEMASTER_USB_BACKUP_PATH=/tmp/nonexistent_backup_target`.
+2. Restart web service: `sudo systemctl restart coffeemaster-web.service`.
+3. Open `/backup`, click `Backup now`.
+Expected:
+- Result contains target-not-found error.
+- `Backup runs` shows failed entry (or alert after retry threshold).
+Cleanup:
+- Restore original path and restart web service.
+
+[ ] ADM-10 Restore preview shows summary
+Preconditions:
+- At least one backup file exists.
+Steps:
+1. Open `/backup`.
+2. Click `Restore preview` on one backup.
+Expected:
+- Summary shows users, transactions, newest transaction timestamp, DB sizes.
+
+[ ] ADM-11 Restore confirm restores DB and creates pre-restore snapshot
+Preconditions:
+- Have backup A and current DB state B that differs.
+Steps:
+1. Create visible difference in current DB (e.g., correction entry).
+2. Preview backup A.
+3. Click `Confirm restore`.
+4. Verify data reverted to backup A state.
+5. Check for `pre_restore_kaffeekasse_backup_*.db` in DB folder.
+Expected:
+- Restore succeeds.
+- Pre-restore snapshot exists.
+
+INTEGRATION TESTS (WE8)
+
+[ ] ADM-12 Integrations page loads WE8 status
+Steps:
+1. Open `/integrations` as admin.
+Expected:
+- WE8 status block is visible with enabled/configured/connected/message fields.
+
+[ ] ADM-13 WE8 poll works in simulation mode
+Preconditions:
+- Set env:
+  - `COFFEEMASTER_WE8_ENABLED=1`
+  - `COFFEEMASTER_WE8_SIMULATE=1`
+- Restart web service.
+Steps:
+1. Open `/integrations`.
+2. Click `Poll` once.
+3. Click `Poll` a second time.
+Expected:
+- First poll may show no events (baseline).
+- Second poll shows detected event(s).
+
+[ ] ADM-14 24h brewed-vs-booked delta is shown
+Preconditions:
+- ADM-13 completed.
+Steps:
+1. Open `/integrations`.
+Expected:
+- Values for brewed(24h), booked(24h), and delta are visible.
+
+POST-TEST CLEANUP
+[ ] A-C01 Restore production values in `/etc/default/coffeemaster9000`.
+[ ] A-C02 Restart services: `sudo systemctl restart coffeemaster-web.service coffeemaster-backup.timer`.

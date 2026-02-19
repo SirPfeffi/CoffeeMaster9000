@@ -1,0 +1,219 @@
+COFFEEMASTER9000 - UAT (TOUCHSCREEN/KIOSK)
+Last updated: 2026-02-19
+Status: Up to date with current codebase (desktop autostart kiosk mode, Kivy 2.3.1).
+
+USAGE
+- Mark each test as [x] only when all expected results pass.
+- Run in listed order because several tests reuse created users.
+
+GLOBAL PRECONDITIONS
+[ ] P-01 Raspberry Pi desktop autologin works and user session is active.
+[ ] P-02 Kiosk app is visible on desktop via `/home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop`.
+[ ] P-03 Web app is reachable at `http://<raspi-ip>:5000`.
+[ ] P-04 Admin bootstrap credentials are configured in `/etc/default/coffeemaster9000`.
+[ ] P-05 Reserved UIDs are available:
+      - `UAT_ADMIN_UID`
+      - `UAT_UID_001`
+      - `UAT_UID_002`
+      - `UAT_UID_003`
+      - `UAT_UID_004`
+
+SETUP (RUN ON PI TERMINAL ONCE)
+1. Load runtime env and DB path:
+   - `set -a; . /etc/default/coffeemaster9000; set +a; echo $COFFEEMASTER_DB_PATH`
+2. Ensure services:
+   - `sudo systemctl restart coffeemaster-web.service coffeemaster-backup.timer`
+3. If kiosk is not visible:
+   - log out and log in once.
+4. Prepare RFID admin test user:
+   - On kiosk, enter UID `UAT_ADMIN_UID`.
+   - Create user `Admin Tester`.
+   - Set admin flag:
+     `sqlite3 "$COFFEEMASTER_DB_PATH" "UPDATE user SET is_admin=1 WHERE rfid_uid='UAT_ADMIN_UID';"`
+
+UAT TESTS
+
+[ ] UAT-00 Touchscreen overlay keyboard appears for text input
+Preconditions:
+- `COFFEEMASTER_KIVY_KEYBOARD_MODE=dock` in `/etc/default/coffeemaster9000`.
+Steps:
+1. Restart kiosk session (logout/login or reboot).
+2. Tap bean amount field on kiosk.
+3. Tap UID simulation input field on kiosk.
+4. Trigger unknown UID and tap first name/last name fields in registration popup.
+Expected:
+- Overlay keyboard appears in all text inputs.
+- Text can be entered without a physical keyboard.
+
+[ ] UAT-01 Unknown RFID -> create new user
+Preconditions:
+- Self-registration enabled.
+Steps:
+1. Enter `UAT_UID_001` in UID simulation input and press Enter.
+2. Keep mode `Create`.
+3. Enter first name `Test`, last name `UserOne`.
+4. Save.
+Expected:
+- User is created and loaded.
+- Balance shows `0.00 EUR`.
+
+[ ] UAT-02 Unknown RFID -> link to existing user
+Preconditions:
+- User from UAT-01 exists.
+- Self-registration enabled.
+Steps:
+1. Enter `UAT_UID_002`.
+2. Switch popup to `Link`.
+3. Select `Test UserOne`.
+4. Save.
+5. Scan `UAT_UID_002` again.
+6. Scan old UID `UAT_UID_001`.
+Expected:
+- `UAT_UID_002` loads `Test UserOne`.
+- Old UID is no longer assigned and is treated as unknown.
+
+[ ] UAT-03 Self-registration disabled blocks unknown RFID
+Preconditions:
+- Admin UID exists (`UAT_ADMIN_UID`).
+Steps:
+1. Scan `UAT_ADMIN_UID`.
+2. In admin screen click `Toggle self-registration` once (disable).
+3. Return to main screen.
+4. Scan unknown UID `UAT_UID_003`.
+Expected:
+- Registration is blocked with self-registration disabled message.
+Cleanup:
+- Re-enable self-registration by toggling again as admin.
+
+[ ] UAT-04 Coffee booking with counts 1..10 works
+Preconditions:
+- Load user `UAT_UID_002`.
+- Ensure positive balance.
+Steps:
+1. For each count 1 to 10:
+   - set count with +/-.
+   - click `Confirm booking`.
+   - wait >= 5 seconds before next booking.
+Expected:
+- All bookings succeed.
+- Description format `Kaffee x<count>`.
+- Balance decreases by 0.17 EUR per coffee.
+
+[ ] UAT-05 Booking count >10 is rejected by UI limit
+Preconditions:
+- Any loaded user.
+Steps:
+1. Press `+` repeatedly.
+Expected:
+- Count never exceeds 10.
+
+[ ] UAT-06 Double booking within 5 seconds is blocked
+Preconditions:
+- Any loaded user.
+Steps:
+1. Book 1 coffee.
+2. Immediately book again (<5s).
+Expected:
+- First booking succeeds.
+- Second shows cooldown error.
+
+[ ] UAT-07 Negative balance allowed
+Preconditions:
+- Load user with low balance.
+Steps:
+1. Book until balance < 0.
+Expected:
+- Booking remains possible when balance becomes negative.
+
+[ ] UAT-08 Negative warning shown immediately (< 0 EUR)
+Preconditions:
+- User balance < 0.
+Steps:
+1. Observe notice under balance.
+Expected:
+- Negative reminder is visible.
+
+[ ] UAT-09 Strong warning shown at <= -25 EUR
+Preconditions:
+- User near -25 EUR.
+Steps:
+1. Set user to around -24.90 EUR (web correction).
+2. Book one coffee.
+Expected:
+- Critical warning appears at <= -25 EUR.
+
+[ ] UAT-10 Post-booking screen shows last 5 + current balance
+Preconditions:
+- At least 6 transactions for user.
+Steps:
+1. Load user and perform one booking.
+2. Check `recent bookings`.
+Expected:
+- Shows exactly latest 5 entries.
+- Balance is current.
+
+[ ] UAT-11 Bean top-up (kg 1..5 + amount) works
+Preconditions:
+- Any loaded user.
+Steps:
+1. Select `2 kg`.
+2. Enter `12.34`.
+3. Book bean purchase.
+Expected:
+- Success message.
+- Balance +12.34 EUR.
+- Top-up transaction with `2 kg`.
+
+[ ] UAT-12 Bean top-up rejects kg > 5
+Preconditions:
+- Admin logged in web.
+Steps:
+1. Open `/users/<id>`.
+2. Override kg value to `6` in dev tools.
+3. Submit.
+Expected:
+- Validation error (`Kg must be between 1 and 5`).
+
+[ ] UAT-13 Bean top-up rejects amount > 100 EUR
+Preconditions:
+- Admin logged in web.
+Steps:
+1. Submit beans top-up kg `1`, amount `100.01`.
+Expected:
+- Validation error (max 100 EUR).
+
+[ ] UAT-14 Duplicate top-up detection works within duplicate window
+Preconditions:
+- Admin logged in web.
+Steps:
+1. Submit beans top-up kg `1`, amount `9.99`.
+2. Submit same kg+amount again within 60s.
+Expected:
+- Second request rejected as duplicate.
+
+[ ] UAT-15 German/English switch works in web
+Preconditions:
+- Web reachable.
+Steps:
+1. Open `/`.
+2. Switch `/lang/en`.
+3. Visit `/users`, `/stats`, `/backup`.
+4. Switch `/lang/de`.
+Expected:
+- Texts switch language consistently.
+
+[ ] UAT-16 GUI language follows COFFEEMASTER_GUI_LANG
+Preconditions:
+- Access to `/etc/default/coffeemaster9000`.
+Steps:
+1. Set `COFFEEMASTER_GUI_LANG=en`.
+2. Restart kiosk session (logout/login or reboot).
+3. Verify English labels.
+4. Repeat with `COFFEEMASTER_GUI_LANG=de`.
+Expected:
+- Kiosk language follows env value.
+
+POST-TEST CLEANUP
+[ ] C-01 Restore production values in `/etc/default/coffeemaster9000`.
+[ ] C-02 Restart `coffeemaster-web.service` and `coffeemaster-backup.timer`.
+[ ] C-03 Remove temporary UAT users only if desired.
