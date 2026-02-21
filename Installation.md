@@ -60,12 +60,14 @@ KAFFEEKASSE_SECRET=<long-random-secret>
 COFFEEMASTER_GUI_LANG=de
 COFFEEMASTER_KIVY_KEYBOARD_MODE=dock
 COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=qwertz
+COFFEEMASTER_KIVY_MOUSE_INPUT=mouse,disable_on_activity
 COFFEEMASTER_WE8_ENABLED=0
 ```
 
 Touchscreen note:
 - `COFFEEMASTER_KIVY_KEYBOARD_MODE=dock` forces Kivy overlay keyboard for `TextInput` fields.
 - Valid modes: `dock`, `systemanddock`, `system`, `multi`, `systemandmulti`.
+- `COFFEEMASTER_KIVY_MOUSE_INPUT=mouse,disable_on_activity` prevents duplicate touch events on some touchscreens.
 
 For first admin bootstrap (one-time):
 

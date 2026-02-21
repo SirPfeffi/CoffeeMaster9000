@@ -175,6 +175,9 @@ fi
 if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=' "${ENV_FILE}"; then
   echo "COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=qwertz" >> "${ENV_FILE}"
 fi
+if ! grep -q '^COFFEEMASTER_KIVY_MOUSE_INPUT=' "${ENV_FILE}"; then
+  echo "COFFEEMASTER_KIVY_MOUSE_INPUT=mouse,disable_on_activity" >> "${ENV_FILE}"
+fi
 if ! grep -q '^COFFEEMASTER_KIVY_FULLSCREEN=' "${ENV_FILE}"; then
   echo "COFFEEMASTER_KIVY_FULLSCREEN=auto" >> "${ENV_FILE}"
 fi

@@ -18,6 +18,12 @@ if keyboard_mode not in {"system", "dock", "multi", "systemanddock", "systemandm
     keyboard_mode = "dock"
 Config.set("kivy", "keyboard_mode", keyboard_mode)
 Config.set("kivy", "keyboard_layout", os.environ.get("COFFEEMASTER_KIVY_KEYBOARD_LAYOUT", "qwertz"))
+# Prevent duplicate touch events from touch+mouse emulation on kiosk screens.
+Config.set(
+    "input",
+    "mouse",
+    os.environ.get("COFFEEMASTER_KIVY_MOUSE_INPUT", "mouse,disable_on_activity"),
+)
 
 from kivy.app import App
 from kivy.clock import Clock
