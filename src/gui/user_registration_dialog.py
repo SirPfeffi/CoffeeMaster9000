@@ -24,7 +24,7 @@ class UserRegistrationDialog(Popup):
         on_submit_callback=None,
         **kwargs,
     ):
-        self.uid = uid
+        self.scanned_uid = uid
         self.users = users or []
         self.can_link = can_link
         self.on_submit_callback = on_submit_callback
@@ -124,13 +124,13 @@ class UserRegistrationDialog(Popup):
                 if not first_name or not last_name:
                     raise ValueError(self.tr("gui.first_last_required"))
                 full_name = f"{first_name} {last_name}"
-                self.on_submit_callback(self.uid, "create", full_name=full_name, user_id=None)
+                self.on_submit_callback(self.scanned_uid, "create", full_name=full_name, user_id=None)
             else:
                 selected = self.user_spinner.text.strip()
                 if ":" not in selected:
                     raise ValueError(self.tr("gui.select_target_required"))
                 user_id = int(selected.split(":", 1)[0].strip())
-                self.on_submit_callback(self.uid, "link", full_name=None, user_id=user_id)
+                self.on_submit_callback(self.scanned_uid, "link", full_name=None, user_id=user_id)
             self.dismiss()
         except Exception as exc:
             logger.exception("Registration dialog failed: %s", exc)
