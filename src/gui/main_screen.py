@@ -56,18 +56,27 @@ class MainScreen(Screen):
             self.fun_text = self.fun_content.next_text() or self.tr("gui.fun_fallback")
 
     def on_rfid(self, uid: str):
-        logger.info("RFID detected: %s", uid)
-        user = self.am.get_user_by_uid(uid)
-        if not user:
-            self.show_registration_dialog(uid)
+        clean_uid = (uid or "").strip()
+        if not clean_uid:
+            self.show_feedback(self.tr("gui.uid_simulation_hint"), error=True, timeout=3)
             return
 
-        if user.is_admin:
-            self.show_feedback(self.tr("gui.admin_mode_enabled"), success=True, timeout=1)
-            Clock.schedule_once(lambda dt: self.switch_to_admin(user), 1)
-            return
+        logger.info("RFID detected: %s", clean_uid)
+        try:
+            user = self.am.get_user_by_uid(clean_uid)
+            if not user:
+                self.show_registration_dialog(clean_uid)
+                return
 
-        self.load_user(user)
+            if user.is_admin:
+                self.show_feedback(self.tr("gui.admin_mode_enabled"), success=True, timeout=1)
+                Clock.schedule_once(lambda dt: self.switch_to_admin(user), 1)
+                return
+
+            self.load_user(user)
+        except Exception as exc:
+            logger.exception("RFID handling failed for uid=%s: %s", clean_uid, exc)
+            self.show_feedback(str(exc), error=True, timeout=5)
 
     def load_user(self, user):
         self._last_user = user
@@ -78,7 +87,7 @@ class MainScreen(Screen):
         self.fun_text = ""
 
     def load_user_by_uid(self, uid: str):
-        self.on_rfid(uid)
+        self.on_rfid((uid or "").strip())
 
     def load_user_by_uid_and_clear(self, text_input_widget):
         uid = text_input_widget.text.strip()
