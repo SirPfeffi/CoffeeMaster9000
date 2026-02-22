@@ -43,6 +43,8 @@ It also configures autologin for `coffeemaster`:
 - kiosk launches from desktop autostart by default: `/home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop`
 - optional legacy mode via systemd service: `KIOSK_LAUNCH_MODE=systemd`
 - Default install path is the current repository directory (for example `/home/coffeemaster/CoffeeMaster9000`).
+- Default DB path is outside the repository: `/var/lib/coffeemaster9000/coffee.db`.
+- Installer behavior: if DB already exists at target path, it is kept (no overwrite). If only legacy DB exists in repo, installer migrates it once.
 - Optional: install to a different path via `sudo APP_DIR=/opt/coffeemaster9000 bash deploy/install_pi.sh`.
 
 ## 4. Configure runtime environment
@@ -167,7 +169,7 @@ sudo nano /etc/default/coffeemaster9000
 Set at least:
 
 ```env
-COFFEEMASTER_DB_PATH=/home/coffeemaster/CoffeeMaster9000/src/data/coffee.db
+COFFEEMASTER_DB_PATH=/var/lib/coffeemaster9000/coffee.db
 COFFEEMASTER_USB_BACKUP_PATH=/media/usb
 COFFEEMASTER_BACKUP_MAX_RETRIES=10
 ```

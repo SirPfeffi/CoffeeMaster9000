@@ -11,6 +11,9 @@ ENABLE_TTY_AUTOLOGIN="${ENABLE_TTY_AUTOLOGIN:-0}"
 KIOSK_LAUNCH_MODE="${KIOSK_LAUNCH_MODE:-desktop}"
 VENV_DIR="${APP_DIR}/.venv"
 ENV_FILE="/etc/default/coffeemaster9000"
+DATA_DIR="${DATA_DIR:-/var/lib/coffeemaster9000}"
+DEFAULT_DB_PATH="${DATA_DIR}/coffee.db"
+LEGACY_DB_PATH="${APP_DIR}/src/data/coffee.db"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Run as root: sudo bash deploy/install_pi.sh"
@@ -27,6 +30,7 @@ echo "SOURCE_DIR=${SOURCE_DIR}"
 echo "APP_DIR=${APP_DIR}"
 echo "APP_USER=${APP_USER}"
 echo "KIOSK_LAUNCH_MODE=${KIOSK_LAUNCH_MODE}"
+echo "DEFAULT_DB_PATH=${DEFAULT_DB_PATH}"
 
 apt-get update
 apt-get install -y python3 python3-dev python3-venv python3-pip build-essential sqlite3 git
@@ -39,6 +43,7 @@ for grp in spi gpio input video render; do
     usermod -aG "${grp}" "${APP_USER}"
   fi
 done
+install -d -m 0750 -o "${APP_USER}" -g "${APP_USER}" "${DATA_DIR}"
 
 # Ensure graphical autologin for dedicated kiosk user.
 if command -v raspi-config >/dev/null 2>&1; then
@@ -159,14 +164,42 @@ EOF
 
 install -m 0644 "${APP_DIR}/deploy/coffeemaster-backup.timer" /etc/systemd/system/coffeemaster-backup.timer
 
+set_or_update_env() {
+  local key="$1"
+  local value="$2"
+  if grep -q "^${key}=" "${ENV_FILE}"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "${ENV_FILE}"
+  else
+    echo "${key}=${value}" >> "${ENV_FILE}"
+  fi
+}
+
 if [[ ! -f "${ENV_FILE}" ]]; then
-  sed "s|^COFFEEMASTER_DB_PATH=.*|COFFEEMASTER_DB_PATH=${APP_DIR}/src/data/coffee.db|" \
+  sed "s|^COFFEEMASTER_DB_PATH=.*|COFFEEMASTER_DB_PATH=${DEFAULT_DB_PATH}|" \
     "${APP_DIR}/deploy/coffeemaster.env.example" > "${ENV_FILE}"
   chmod 0644 "${ENV_FILE}"
-elif grep -q '^COFFEEMASTER_DB_PATH=' "${ENV_FILE}"; then
-  sed -i "s|^COFFEEMASTER_DB_PATH=.*|COFFEEMASTER_DB_PATH=${APP_DIR}/src/data/coffee.db|" "${ENV_FILE}"
+fi
+
+CONFIGURED_DB_PATH="$(sed -n 's/^COFFEEMASTER_DB_PATH=//p' "${ENV_FILE}" | tail -n 1)"
+if [[ -z "${CONFIGURED_DB_PATH}" ]]; then
+  CONFIGURED_DB_PATH="${DEFAULT_DB_PATH}"
+  set_or_update_env "COFFEEMASTER_DB_PATH" "${CONFIGURED_DB_PATH}"
+elif [[ "${CONFIGURED_DB_PATH}" == "${LEGACY_DB_PATH}" ]]; then
+  CONFIGURED_DB_PATH="${DEFAULT_DB_PATH}"
+  set_or_update_env "COFFEEMASTER_DB_PATH" "${CONFIGURED_DB_PATH}"
+fi
+
+TARGET_DB_DIR="$(dirname "${CONFIGURED_DB_PATH}")"
+install -d -m 0750 -o "${APP_USER}" -g "${APP_USER}" "${TARGET_DB_DIR}"
+if [[ -f "${CONFIGURED_DB_PATH}" ]]; then
+  echo "Existing DB found at ${CONFIGURED_DB_PATH}. Keeping it (no overwrite)."
+elif [[ -f "${LEGACY_DB_PATH}" && "${LEGACY_DB_PATH}" != "${CONFIGURED_DB_PATH}" ]]; then
+  cp -a "${LEGACY_DB_PATH}" "${CONFIGURED_DB_PATH}"
+  chown "${APP_USER}:${APP_USER}" "${CONFIGURED_DB_PATH}"
+  chmod 0640 "${CONFIGURED_DB_PATH}"
+  echo "Migrated DB from ${LEGACY_DB_PATH} to ${CONFIGURED_DB_PATH}."
 else
-  echo "COFFEEMASTER_DB_PATH=${APP_DIR}/src/data/coffee.db" >> "${ENV_FILE}"
+  echo "No existing DB to migrate. DB will be initialized on first app start at ${CONFIGURED_DB_PATH}."
 fi
 
 if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_MODE=' "${ENV_FILE}"; then
@@ -227,4 +260,5 @@ systemctl enable coffeemaster-backup.timer
 systemctl restart coffeemaster-web.service
 systemctl restart coffeemaster-backup.timer
 
+echo "Configured DB path: ${CONFIGURED_DB_PATH}"
 echo "Installation complete. APP_DIR=${APP_DIR} KIOSK_LAUNCH_MODE=${KIOSK_LAUNCH_MODE}"
