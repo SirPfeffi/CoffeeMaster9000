@@ -167,11 +167,15 @@ install -m 0644 "${APP_DIR}/deploy/coffeemaster-backup.timer" /etc/systemd/syste
 set_or_update_env() {
   local key="$1"
   local value="$2"
-  if grep -q "^${key}=" "${ENV_FILE}"; then
-    sed -i "s|^${key}=.*|${key}=${value}|" "${ENV_FILE}"
-  else
-    echo "${key}=${value}" >> "${ENV_FILE}"
+  local tmp
+  if [[ ! -f "${ENV_FILE}" ]]; then
+    install -m 0644 /dev/null "${ENV_FILE}"
   fi
+  tmp="$(mktemp)"
+  grep -v "^${key}=" "${ENV_FILE}" > "${tmp}" || true
+  printf "%s=%s\n" "${key}" "${value}" >> "${tmp}"
+  cat "${tmp}" > "${ENV_FILE}"
+  rm -f "${tmp}"
 }
 
 if [[ ! -f "${ENV_FILE}" ]]; then
@@ -183,11 +187,10 @@ fi
 CONFIGURED_DB_PATH="$(sed -n 's/^COFFEEMASTER_DB_PATH=//p' "${ENV_FILE}" | tail -n 1)"
 if [[ -z "${CONFIGURED_DB_PATH}" ]]; then
   CONFIGURED_DB_PATH="${DEFAULT_DB_PATH}"
-  set_or_update_env "COFFEEMASTER_DB_PATH" "${CONFIGURED_DB_PATH}"
 elif [[ "${CONFIGURED_DB_PATH}" == "${LEGACY_DB_PATH}" ]]; then
   CONFIGURED_DB_PATH="${DEFAULT_DB_PATH}"
-  set_or_update_env "COFFEEMASTER_DB_PATH" "${CONFIGURED_DB_PATH}"
 fi
+set_or_update_env "COFFEEMASTER_DB_PATH" "${CONFIGURED_DB_PATH}"
 
 TARGET_DB_DIR="$(dirname "${CONFIGURED_DB_PATH}")"
 install -d -m 0750 -o "${APP_USER}" -g "${APP_USER}" "${TARGET_DB_DIR}"
@@ -202,18 +205,10 @@ else
   echo "No existing DB to migrate. DB will be initialized on first app start at ${CONFIGURED_DB_PATH}."
 fi
 
-if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_MODE=' "${ENV_FILE}"; then
-  echo "COFFEEMASTER_KIVY_KEYBOARD_MODE=dock" >> "${ENV_FILE}"
-fi
-if ! grep -q '^COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=' "${ENV_FILE}"; then
-  echo "COFFEEMASTER_KIVY_KEYBOARD_LAYOUT=qwertz" >> "${ENV_FILE}"
-fi
-if ! grep -q '^COFFEEMASTER_KIVY_MOUSE_INPUT=' "${ENV_FILE}"; then
-  echo "COFFEEMASTER_KIVY_MOUSE_INPUT=mouse,disable_on_activity" >> "${ENV_FILE}"
-fi
-if ! grep -q '^COFFEEMASTER_KIVY_FULLSCREEN=' "${ENV_FILE}"; then
-  echo "COFFEEMASTER_KIVY_FULLSCREEN=auto" >> "${ENV_FILE}"
-fi
+set_or_update_env "COFFEEMASTER_KIVY_KEYBOARD_MODE" "dock"
+set_or_update_env "COFFEEMASTER_KIVY_KEYBOARD_LAYOUT" "qwertz"
+set_or_update_env "COFFEEMASTER_KIVY_MOUSE_INPUT" "mouse,disable_on_activity"
+set_or_update_env "COFFEEMASTER_KIVY_FULLSCREEN" "auto"
 
 APP_HOME="$(getent passwd "${APP_USER}" | cut -d: -f6)"
 AUTOSTART_DIR="${APP_HOME}/.config/autostart"
