@@ -181,8 +181,9 @@ set_or_update_env() {
 if [[ ! -f "${ENV_FILE}" ]]; then
   sed "s|^COFFEEMASTER_DB_PATH=.*|COFFEEMASTER_DB_PATH=${DEFAULT_DB_PATH}|" \
     "${APP_DIR}/deploy/coffeemaster.env.example" > "${ENV_FILE}"
-  chmod 0644 "${ENV_FILE}"
 fi
+chown root:"${APP_USER}" "${ENV_FILE}"
+chmod 0640 "${ENV_FILE}"
 
 CONFIGURED_DB_PATH="$(sed -n 's/^COFFEEMASTER_DB_PATH=//p' "${ENV_FILE}" | tail -n 1)"
 if [[ -z "${CONFIGURED_DB_PATH}" ]]; then
