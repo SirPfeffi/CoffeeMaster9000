@@ -10,7 +10,7 @@ GLOBAL PRECONDITIONS
 [ ] P-01 Raspberry Pi desktop autologin works and user session is active.
 [ ] P-02 Kiosk app is visible on desktop via `/home/coffeemaster/.config/autostart/coffeemaster-kiosk.desktop`.
 [ ] P-03 Web app is reachable at `http://<raspi-ip>:5000`.
-[ ] P-04 Admin bootstrap credentials are configured in `/etc/default/coffeemaster9000`.
+[ ] P-04 Admin bootstrap credentials are configured in `/etc/default/coffeemaster9000` (create file if missing, see setup step 0).
 [ ] P-05 Reserved UIDs are available:
       - `UAT_ADMIN_UID`
       - `UAT_UID_001`
@@ -19,6 +19,13 @@ GLOBAL PRECONDITIONS
       - `UAT_UID_004`
 
 SETUP (RUN ON PI TERMINAL ONCE)
+0. If env file is missing, create it from project example:
+   - `if [ ! -f /etc/default/coffeemaster9000 ]; then sudo cp /home/coffeemaster/CoffeeMaster9000/deploy/coffeemaster.env.example /etc/default/coffeemaster9000; fi`
+   - `sudo nano /etc/default/coffeemaster9000`
+   - set at least:
+     - `KAFFEEKASSE_SECRET=<long-random-secret>`
+     - `COFFEEMASTER_BOOTSTRAP_ADMIN=admin`
+     - `COFFEEMASTER_BOOTSTRAP_PASSWORD=<strong-password>`
 1. Load runtime env and DB path:
    - `set -a; . /etc/default/coffeemaster9000; set +a; echo $COFFEEMASTER_DB_PATH`
 2. Ensure services:
